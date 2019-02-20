@@ -4,42 +4,25 @@ close all; clear all;
 restoredefaultpath;
 addpath([pwd,'/src/'],genpath([pwd,'/external-functions/'])); 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Initialize parameters %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-par = initialize_parameters();
+par = input_parameters();
 
-%----------% Physical parameters %----------%
-par.U0 = 5.0;            % Spreading-rate [cm/yr]
-par.W0 = par.U0*par.cmyr_to_ms*2.0/pi;
+%----------% Modify some parameters %----------%
+par.tp = 100.e3; 
 
-%----------% Fluid dynamics parameters %----------%
-par.n = 3;              % Permeability-porosity exponent
-par.k = 1.e-6;          % Permeability [m^2]
+%----------% Spatial and time arrays %----------%
+zarray = linspace(0,1,par.nz);
 
-%----------% Carbon parameters %----------%
-par.cs0_vol  = 1e-4;    % Initial concentration of volatile element in solid 
-par.D_vol    = 1e-4;    % Partition coefficient of volatile element in solid
-par.M_vol    = 1e6;     % Solidus changes due to changes in composition (value Crowley et al. 2015)
-
-
-%----------% Spatial and time parameters  %----------%
-par.H = -(par.TsP0 - par.T_pot - par.M_vol*par.cs0_vol)/(par.nu^-1*par.rhom*par.grav)*1e-3; % Column height == depth at which T=Tsol for a given TsP0 
-par.t0   = par.H*1e3/par.W0;  % [s] 
-
-par.nz  = 2000;  zarray=linspace(0,1,par.nz);
-par.tp  = 100e3;    % Forcing period [yr] 
-
-%----------% Get dimensionless parameters %----------%
-par = get_nondim_parameters(par); 
+nperiods = 2; tf = nperiods*par.tp/par.t0;
+time   = linspace(0,2*tf,par.ntime);
 
 %----------% Plotting parameters %----------%
 nfig=0;
 linew=3;
 fontsize=18;
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------%    Solving problem     %----------%
@@ -54,8 +37,12 @@ plot_meanfields(nfig,MFields,zarray,par,linew,fontsize)
 
 %----------% Calculate fluctuations %----------%
 [~,~,FFields.ch,FFields.phih] = fluctuations(zarray,par);
+[FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.c,FFields.phih,FFields.ch,par); 
 
 %----------% Plot perturbed state %----------%
-nfig=nfig+1; figure(nfig) 
+nfig=nfig+1; figure(nfig); 
 plot_fluctuationsh(nfig,MFields,FFields,zarray,par,linew,fontsize);
+
+nfig=nfig+1; figure(nfig);
+plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperiods);
 

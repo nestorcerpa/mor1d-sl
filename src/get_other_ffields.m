@@ -9,11 +9,11 @@ function [Wh,fh,fch] = get_other_ffields(phib,cb,phih,ch,par)
     Wh = Q * (phib.^n .* phih - n * phih .* phib.^(n-1) .* (1-phib));
     
     %----------% Fluctuating melt flux %----------% 
-    Wb = 1 - Q .* (phib.^n.*(1-phib)); % \bar{W}
-    fh = phib.*phih + Wb .* phih;
+    Wb = 1 - Q .* phib.^n.*(1-phib); % \bar{W}
+    fh = -(1-phib).*Wh + Wb .* phih;
 
     %----------% Fluctuating chemical flux %----------% 
     fb = 1 - (1-phib).*Wb;
-    fch = cb.*fh + fb.*ch;
+    fch = (cb.*fh + fb.*ch)/par.D_vol;
     
 end

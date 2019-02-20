@@ -30,7 +30,7 @@ z=0;
 [~,~,~,~,dx0,dy0] = mean_analytical(z,par);
 
 %----------% calculate perturbed state
-sol = ode45(@ode,[0 1],[-dx0;-dy0],options);
+sol = ode45(@(zi,y) ode(zi,y,par),[0 1],[-dx0;-dy0],options);
 
 %----------% output
 xh=deval(z_out,sol,1);
@@ -40,14 +40,19 @@ dQdphi =  Q*(n*phi.^(n-1).*(1-phi).^2 - 2*(1-phi).*phi.^n);
 phih=yh./(1+dQdphi);
 ch = xh/M; 
 
-    function deriv = ode(z,y)
+    function deriv = ode(z,y,par)
         xh = y(1);
         yh = y(2);
         [x,y,~,phi,dx,dy] = mean_analytical(z,par);
         dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n);
         phih=yh/(1+dQdphi);
-        dxh = (D+x+y)^(-1) *( 1i*w*G*x - xh*(1i*w*(D+phi+x)+dy) - yh*dx);
-        dyh = 1i*w*(xh-G-phih) +dxh;
+        if (strcmp(par.RHSODE,'on')==1)
+            dxh = (D+x+y)^(-1) *( 1i*w*G*x - xh*(1i*w*(D+phi+x)+dy) - yh*dx);
+            dyh = 1i*w*(xh-G-phih) +dxh;
+        elseif (strcmp(par.RHSODE,'off')==1)
+            dxh = (D+x+y)^(-1) *(- xh*(1i*w*(D+phi+x)+dy) - yh*dx);
+            dyh = 1i*w*(xh-phih) +dxh;            
+        end
         deriv = [dxh;dyh];
     end
 
