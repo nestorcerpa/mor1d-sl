@@ -1,29 +1,29 @@
 ## Software : mor1d-sl
 
 
-## License 
+## Licence 
 
-MIT License
+MIT Licence
 
 Copyright (c) 2019
-    Nestor Cerpa [nestor.cerpa@gm.univ-montp2.fr] 
-	  Geosciences Montpellier
-          University of Montpellier 
-          Place Eugene Bataillon 
-          34095 Montpellier Cedex05 
-          France
+    Nestor Cerpa [nestor.cerpa@gm.univ-montp2.fr]
+	Geosciences Montpellier
+	University of Montpellier
+	Place Eugene Bataillon
+	34095 Montpellier Cedex05
+	France
     David Rees Jones [david.reesjones@earth.ox.ac.uk] 
-	  University of Oxford 	  
-	  Earth Sciences
-	  South Parks Road
-	  Oxford, OX1 3AN
-	  United Kingdom
+	University of Oxford
+	Earth Sciences
+	South Parks Road
+	Oxford, OX1 3AN
+	United Kingdom
     Richard F. Katz [richard.katz@earth.ox.ac.uk]
-          University of Oxford
-          Earth Sciences
-          South Parks Road
-          Oxford, OX1 3AN
-          United Kingdom
+	University of Oxford
+	Earth Sciences
+	South Parks Road
+	Oxford, OX1 3AN
+	United Kingdom
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

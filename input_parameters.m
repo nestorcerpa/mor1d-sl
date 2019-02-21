@@ -1,4 +1,4 @@
-% MIT License
+% MIT Licence
 % 
 % Copyright (c) 2019
 %     Nestor G. Cerpa       (University of Montpellier) [nestor.cerpa@gm.univ-montp2.fr]
