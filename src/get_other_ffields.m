@@ -1,4 +1,4 @@
-function [Wh,fh,fch] = get_other_ffields(phib,cb,phih,ch,par)
+function [Wh,fh,fch] = get_other_ffields(phib,csb,phih,csh,par)
 
     Q = par.Q;
     n = par.n;
@@ -14,6 +14,6 @@ function [Wh,fh,fch] = get_other_ffields(phib,cb,phih,ch,par)
 
     %----------% Fluctuating chemical flux %----------% 
     fb = 1 - (1-phib).*Wb;
-    fch = (cb.*fh + fb.*ch)/par.D_vol;
+    fch = (csb.*fh + fb.*csh)/par.D_vol;
     
 end

@@ -32,7 +32,7 @@ function plot_fluctuationsh(nfig,MFields,FFields,zarray,par,linew,fontsize)
     
     %----------% Amplitude of \hat{c} %----------%
     p(1,2).select(); F01=gca; 
-    plot(F01,log10(abs(FFields.ch)),zarray,'k','linewidth',linew);
+    plot(F01,log10(abs(FFields.csh)),zarray,'k','linewidth',linew);
     xlabel(F01,'$\vert\hat{c}\vert$','Fontsize',fontsize);
     ylabel(F01,'$z$'); 
     set(F01,'ylim',[0 1],'Ytick',0:0.25:1);
@@ -59,8 +59,8 @@ function plot_fluctuationsh(nfig,MFields,FFields,zarray,par,linew,fontsize)
     
     %----------% Phase-angle of \hat{c} %----------%
     p(2,2).select(); F01=gca; 
-    plot(F01,wrapTo2Pi(-angle(FFields.ch)),zarray,'k','linewidth',linew);
-    xlabel(F01,'$\psi_{\hat{c}}$','Fontsize',fontsize);
+    plot(F01,wrapTo2Pi(-angle(FFields.csh)),zarray,'k','linewidth',linew);
+    xlabel(F01,'$\psi_{\hat{c_s}}$','Fontsize',fontsize);
     ylabel(F01,'$z$'); 
     set(F01,'xlim',[0 2*pi],'Xtick',[0 pi/2 pi 3*pi/2 2*pi],'Xticklabel',{'$0$','$\frac{\pi}{2}$','$\pi$','$\frac{3\pi}{2}$','$2\pi$'})
     set(F01,'ylim',[0 1],'Ytick',0:0.25:1);

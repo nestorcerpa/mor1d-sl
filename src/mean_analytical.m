@@ -1,4 +1,4 @@
-function [x,y,c,phi,dx,dy] = mean_analytical(z,par)
+function [x,y,cs,phi,dx,dy] = mean_analytical(z,par)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % MEAN_ANALYTICAL : Calculatesmean variables and derivatives
@@ -9,7 +9,7 @@ function [x,y,c,phi,dx,dy] = mean_analytical(z,par)
     %       par.M=$\mathcal{M}$
     %       par.Q=$\mathcal{Q}$
     %    Outputs 
-    %       c   : mean solid concentration
+    %       cs  : mean solid concentration
     %       phi : mean porosity
     %       x   : change of variable x = Mc
     %       y   : change of variable y = phi + q(phi)
@@ -57,7 +57,7 @@ function [x,y,c,phi,dx,dy] = mean_analytical(z,par)
     end
 
     %----------% Calculate concentration (change variables)
-    c=x/M;
+    cs=x/M;
 
     %----------% Calculate derivatives
     dx=-x*G./(2*x+f); 

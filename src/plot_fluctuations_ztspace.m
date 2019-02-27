@@ -9,7 +9,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     [T,Z] = meshgrid(t,z); 
 
     phip  = par.delta0*real(exp(1i*par.omega*t')*FFields.phih);              % time-dependent fluctuating porosity
-    clp   = par.delta0*real(exp(1i*par.omega*t')*FFields.ch/par.D_vol);      % time-dependent fluctuating liquid concentration
+    clp   = par.delta0*real(exp(1i*par.omega*t')*FFields.csh/par.D_vol);     % time-dependent fluctuating liquid concentration
     fp    = par.delta0*real(exp(1i*par.omega*t')*FFields.fh);                % time-dependent fluctuating melt flux
     fcp   = par.delta0*real(exp(1i*par.omega*t')*FFields.fch);               % time-dependent fluctuating chemical flux
 

@@ -10,27 +10,26 @@ addpath([pwd,'/src/'],genpath([pwd,'/external-functions/']));
 
 par = input_parameters();
 
+%----------% Other parameters %----------%
+z_out = 1; % z-coordinate for computation of the results
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Extract SL record within time-window (time) %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 time_window = [-1000. 0.];  % Time window for extracting data in SL-record
-tp_min      = 10;           % Minimum period in Fourier Transform
+tp_min      = 1;            % Minimum sampling period in Fourier Transform
 
 [SL,SLrecord_window] = Func_ReadSLrecord_cutF('Siddall_2010.txt',time_window,tp_min);
-
-zarray = linspace(0,1,par.nz);
-par.ntime = length(SL.time);          % Number of time-steps 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Computation of response to SL record %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------% Calculate mean state %----------%
-[~,~,MFields.c,MFields.phi,~,~] = mean_analytical(zarray,par); % calculate mean state analytically
+[~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(z_out,par); % calculate mean state analytically
 %----------% Get other mean variables %----------%
-[MFields.W,MFields.f,MFields.fc] = get_other_mfields(MFields.phi,MFields.c,par);
-
+[MFields.W,MFields.f,MFields.fc] = get_other_mfields(MFields.phi,MFields.cs,par);
 
 nperiod = length(SL.dfs.period); 
 
@@ -55,12 +54,13 @@ for iperiod = 1:nperiod
     par.omega = 2.*pi/par.tp*par.t0;
 
     %----------% Calculate fluctuating variables %----------%
-    [~,~,FFields.ch,FFields.phih] = fluctuations(zarray,par);
+    [~,~,FFields.csh,FFields.phih] = fluctuations(z_out,par); % calculate fluctuating fields at z_out;
     %----------% Get other fluctuating variables %----------%
-    [FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.c,FFields.phih,FFields.ch,par); 
+    [FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
+    %----------% Saving fields at top of the column %----------%
     MODEL.phih_top(iperiod,1) = FFields.phih(end);
-    MODEL.clh_top(iperiod,1)  = FFields.ch(end)/par.D_vol;
+    MODEL.clh_top(iperiod,1)  = FFields.csh(end)/par.D_vol;
     MODEL.fh_top(iperiod,1)   = FFields.fh(end);
     MODEL.fch_top(iperiod,1)  = FFields.fch(end);
 

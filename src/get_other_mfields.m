@@ -1,4 +1,4 @@
-function [W,f,fc] = get_other_mfields(phi,c,par)
+function [W,f,fc] = get_other_mfields(phi,cs,par)
 
     Q = par.Q; n = par.n;
     
@@ -9,6 +9,6 @@ function [W,f,fc] = get_other_mfields(phi,c,par)
     f  = 1 - (1-phi).*W;
     
     %----------% Mean chemical flux %----------% 
-    fc = f.*c/par.D_vol;
+    fc = f.*cs/par.D_vol;
     
 end

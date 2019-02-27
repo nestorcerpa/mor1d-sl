@@ -29,7 +29,7 @@ function plot_meanfields(nfig,MFields,zarray,par,linew,fontsize)
       
     %----------% Concentration in solid %----------%
     p(1,2).select(); F01=gca; 
-    semilogx(F01,MFields.c,zarray,'k','linewidth',linew); hold(F01,'on');
+    semilogx(F01,MFields.cs,zarray,'k','linewidth',linew); hold(F01,'on');
     xlabel(F01,'$\overline{c}$','Fontsize',fontsize);
     set(F01,'ylim',[0 1],'Ytick',0:0.25:1)
     set(F01,'YtickLabel',[]);       
@@ -48,9 +48,9 @@ function plot_meanfields(nfig,MFields,zarray,par,linew,fontsize)
     grid(F01,'on'); set(F01,'XMinorGrid','on','YMinorGrid','on');  
     
     %----------% Chemical flux %----------%
-    fc = MFields.c/par.D_vol .* f;
+    fc = MFields.cs/par.D_vol .* f;
     p(1,4).select(); F01=gca; 
-    semilogx(F01,fc,zarray,'k','linewidth',linew); hold(F01,'on');
+    semilogx(F01,MFields.fc,zarray,'k','linewidth',linew); hold(F01,'on');
     xlabel(F01,'$\overline{f_c}$','Fontsize',fontsize);
     set(F01,'ylim',[0 1],'Ytick',0:0.25:1)
     set(F01,'yaxislocation','right');       

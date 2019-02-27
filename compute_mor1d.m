@@ -27,16 +27,13 @@ close all; clear all;
 
 %----------% Add paths to functions %----------%
 restoredefaultpath;
-addpath([pwd,'/src/'],genpath([pwd,'/external-functions/'])); 
+addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Initialize parameters %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 par = input_parameters();
-
-%----------% Modify some parameters %----------%
-par.tp = 100.e3; 
 
 %----------% Spatial and time arrays %----------%
 zarray = linspace(0,1,par.nz);
@@ -54,18 +51,18 @@ fontsize=18;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------% Calculate mean state %----------%
-[~,~,MFields.c,MFields.phi,~,~] = mean_analytical(zarray,par); %calcuate base state analytically
+[~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(zarray,par); %calcuate base state analytically
 
 %----------% Get other mean variables %----------%
-[MFields.W,MFields.f,MFields.fc] = get_other_mfields(MFields.phi,MFields.c,par);
+[MFields.W,MFields.f,MFields.fc] = get_other_mfields(MFields.phi,MFields.cs,par);
     
 %----------% Plot mean state %----------%
 nfig=nfig+1; figure(nfig); 
-plot_meanfields(nfig,MFields,zarray,par,linew,fontsize)
+plot_meanfields(nfig,MFields,zarray,par,linew,fontsize);
 
 %----------% Calculate fluctuations %----------%
-[~,~,FFields.ch,FFields.phih] = fluctuations(zarray,par);
-[FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.c,FFields.phih,FFields.ch,par); 
+[~,~,FFields.csh,FFields.phih] = fluctuations(zarray,par);
+[FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
 %----------% Plot perturbed state %----------%
 nfig=nfig+1; figure(nfig); 
