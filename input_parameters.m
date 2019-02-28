@@ -83,6 +83,10 @@ function par=input_parameters()
     %----------%  ##  Modifying matlab options  ##  %----------%
     %----------%%----------%%----------%%----------%%----------%    
     
+    %----------% Add paths to functions %----------%
+    restoredefaultpath;
+    addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
+
     %----------% Latex font %----------%
     if (strcmp(get(groot,'defaulttextinterpreter'),'latex')~=1); set(groot,'defaulttextinterpreter','latex'); end;
     if (strcmp(get(groot,'defaultAxesTickLabelInterpreter'),'latex')~=1); set(groot,'defaultAxesTickLabelInterpreter','latex'); end;
@@ -93,7 +97,8 @@ function par=input_parameters()
     %----------%  ##  Display input parameters  ##  %----------%
     %----------%%----------%%----------%%----------%%----------%
     if (strcmp(par.verb,'on')==1)
-       fprintf('\n\n #-----# D = %4.1e ; Gamma = %4.2f ; M = %4.2f ; Q = %5.1e ; omega = %5.1f; #-----# \n\n',par.D_vol,par.G,par.M,par.Q,par.omega); 
+       fprintf('\n\n #-----# \t\t   INITIALIZATION OF MODEL PARAMETERS  \t\t   #-----#') 
+       fprintf('\n #-----# D = %4.1e ; Gamma = %4.2f ; M = %4.2f ; Q = %5.1e ; omega = %5.1f; #-----# \n\n',par.D_vol,par.G,par.M,par.Q,par.omega); 
     end
     
 end

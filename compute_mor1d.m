@@ -25,10 +25,6 @@
 
 close all; clear all;
 
-%----------% Add paths to functions %----------%
-restoredefaultpath;
-addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Initialize parameters %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
