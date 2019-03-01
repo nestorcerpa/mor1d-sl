@@ -54,7 +54,7 @@ Consequences of sea-level variations during glacial cycles for magmatism and car
 * Data files used for plotting Figures 6 and 7 are provided 
 
 ## INSTRUCTIONS:
-1. To generate Figures 2 and 3 from the EPSL paper : Run column_mor1d.m
+1. To generate Figures 2 and 3 from the EPSL paper : Run mor1d.m
 2. To generate Figures 4 and 5 from the EPSL paper : Run column_wetdry.m
 3. To generate Figure 6 from the EPSL paper : Run column_admittance_plot.m (to re-calculate data used by the script : run column_admittance_compute.m) 
 4. To generate Figure 7 from the EPSL paper : Run column_slrecord_plot.m (to re-calculate data used by the scipt : run column_slrecord_compute.m)
