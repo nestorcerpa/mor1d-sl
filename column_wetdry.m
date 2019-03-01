@@ -86,7 +86,7 @@ for iH = 1:length(Harray)
     end
     
 end
-fprintf('\n ... end of loop over models \n')
+fprintf('... end of loop over models \n')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------%    Making figures    %----------%
@@ -103,16 +103,11 @@ plot_wetdry_fluxes(nfig,'fc',array_MFields,array_FFields,array_par,fonts,linew,f
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%         LOCAL FUNCTIONS         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function plot_wetdry_fluxes(nfig,type_flux,array_MFields,array_FFields,array_par,fontsize,linew,frange); 
 
-    %----------%%----------%%----------%%----------%%----------%%----------%
-    %----------%%----------%%----------%%----------%%----------%%----------%
-    %----------%%----------%    Plotting figure     %----------%%----------% 
-    %----------%%----------%%----------%%----------%%----------%%----------%
-    %----------%%----------%%----------%%----------%%----------%%----------%
 
     %------------% Figure properties %------------%
     set(nfig,'position', [0, 100, 800, 1000]);
@@ -132,10 +127,10 @@ function plot_wetdry_fluxes(nfig,type_flux,array_MFields,array_FFields,array_par
     p(2).marginbottom=5; p(3).margintop=0; % Stick 2nd and 3rd rows
     p(3).marginbottom=5; p(4).margintop=0; % Stick 2nd and 3rd rows
 
-    p.margin = [50 30 12 9];   %% margin[left bottom right top]
+    p.margin = [50 30 15 9];   %% margin[left bottom right top]
 
     nc=20;  % Number of sub-divisions in colormap
-    cmap1 = colormap(summer(nc)); %cmap1 = cmap1(end:-1:1,:);
+    cmap1 = colormap(summer(nc)); 
     cmap2 = colormap(autumn(nc)); cmap2 = cmap2(end:-1:1,:);
     cmap = [cmap1;cmap2]; 
     
@@ -210,35 +205,15 @@ function plot_wetdry_fluxes(nfig,type_flux,array_MFields,array_FFields,array_par
             set(F_row1,'Xlim',[0 2],'Xtick',[0 0.5 1.0 3/2 2],'XTickLabel',[]);
 
             %------------%%------------% Plotting flux %------------%%------------%
-
-            fp0=fp;
-            fp(abs(fp)<10^frange(1))=10^frange(1)*sign(fp(abs(fp)<10^frange(1)));
-            fp(abs(fp)>10^frange(2))=10^frange(2)*sign(fp(abs(fp)>10^frange(2)));
-
-            % Defining bounds
-            logscale.min_sat  = frange(1);
-            logscale.max_sat  = frange(2); 
-            logscale.min      = min(min(log10(abs(fp0))));
-            logscale.max      = max(max(log10(abs(fp0))));
-            logscale.diff_sat = logscale.max_sat - logscale.min_sat + 1; %% +1 is to take into account lower bound for saturation
-            logscale.end_sat  = round(logscale.min_sat - logscale.diff_sat);
-
-            % Rescaling array
-            fp_m = zeros(size(fp));
-            fp_m(fp>0)  = log10(fp(fp>0));
-            fp_m(fp<0)  = logscale.end_sat  - log10(-fp(fp<0)) + logscale.max_sat;
-            fp_m(fp==0) = logscale.min_sat; 
-            fp_m(fp_m<logscale.end_sat)=logscale.end_sat;
-
-            ticks_rescaled =  logscale.end_sat:1:frange(2);         
-
-            %----------%  Plot f  %----------%
             p(1+iH,jT).select(); F01=gca;
+            
+            [fp_m,logscale,ticks_rescaled] = log_negative(fp,frange); % Rescale field to display log of negative values    
 
             [FC,h]=contourf(F01,T,Z,fp_m(1:end,:)',linspace(ticks_rescaled(1),ticks_rescaled(end),2*nc+1)); h.LineStyle='none'; hold on;
             caxis(F01,[min(ticks_rescaled) max(ticks_rescaled)]); 
             colormap(F01,cmap);
 
+            %------------% Managing Axis
             set(F01,'Box','on');
             set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange);
             if (iH==1) 
@@ -264,9 +239,62 @@ function plot_wetdry_fluxes(nfig,type_flux,array_MFields,array_FFields,array_par
          end
 
         if (jT == 2)          
-            % Managing colorbar
-            colbar=colorbar(F01,'Location','southoutside','Position',[x0_colbar1 y0_colbar1 xl_colbar1 yl_colbar1],'Units','normalized');
-            colbar.Limits=caxis;
+            %------------% Managing ColorBar
+            colbar = draw_colorbar(F01,caxis,logscale,[x0_colbar1 y0_colbar1 xl_colbar1 yl_colbar1],[-0.1 -0.2],str_colorbar_label);
+        else
+        end   
+
+        drawnow;
+
+     end
+    t = annotation('textbox',[0.003 0.7 0.1 0.062],'String',type_model{1},'interpreter', 'latex','fontsize',fontsize,'EdgeColor',[0.0 0 0.0],'LineStyle',lstyle{1},'Linewidth',linew); t.HorizontalAlignment = 'center';
+    t = annotation('textbox',[0.003 0.38 0.1 0.062],'String',type_model{2},'interpreter', 'latex','fontsize',fontsize,'EdgeColor',[0.0 0 0.0],'LineStyle',lstyle{2},'Linewidth',linew); t.HorizontalAlignment = 'center';
+    t = annotation('textbox',[0.003 0.165 0.1 0.062],'String',type_model{3},'interpreter', 'latex','fontsize',fontsize,'EdgeColor',[0.0 0 0.0],'LineStyle',lstyle{3},'Linewidth',linew); t.HorizontalAlignment = 'center';
+  
+  fprintf(' ... DONE \n\n');
+  
+  
+        function [field_m,logscale,ticks_rescaled] = log_negative(field,range)
+            
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %  LOG_NEGATIVE rescales fields to plot log of negative values
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+            field0=field;
+            field(abs(field)<10^range(1))=10^range(1)*sign(field(abs(field)<10^range(1)));
+            field(abs(field)>10^range(2))=10^range(2)*sign(field(abs(field)>10^range(2)));
+
+            %------------% Defining bounds
+            logscale.min_sat  = range(1);
+            logscale.max_sat  = range(2); 
+            logscale.min      = min(min(log10(abs(field0))));
+            logscale.max      = max(max(log10(abs(field0))));
+            logscale.diff_sat = logscale.max_sat - logscale.min_sat + 1; %% +1 is to take into account lower bound for saturation
+            logscale.end_sat  = round(logscale.min_sat - logscale.diff_sat);
+
+            %------------% Rescaling array
+            field_m = zeros(size(field));
+            field_m(field>0)  = log10(field(field>0));
+            field_m(field<0)  = logscale.end_sat  - log10(-field(field<0)) + logscale.max_sat;
+            field_m(field==0) = logscale.min_sat; 
+            field_m(field_m<logscale.end_sat)=logscale.end_sat;
+
+            ticks_rescaled =  logscale.end_sat:1:range(2);    
+
+
+        end
+    
+    
+        function colbar = draw_colorbar(fig,caxis,logscale,pos_colorbar,pos_label,str_colorbar_label)
+           
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %  DRAW_COLORBAR displays colorbar and manages label/ticks-label appearance
+        %    Output 
+        %       colbar : colorbar properties object
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            colbar=colorbar(fig,'Location','southoutside','Position',pos_colorbar,'Units','normalized'); % colorbar position
+            colbar.Limits= caxis;
             colbar.Ticks = ticks_rescaled;
             colbar.TickDirection='out';  colbar.TickLength=0.02;
             colbar.TickLabelInterpreter='LaTex'; 
@@ -278,18 +306,11 @@ function plot_wetdry_fluxes(nfig,type_flux,array_MFields,array_FFields,array_par
                     colbar.TickLabels{I} = ['$10^{',num2str(n),'}$'];
                 end
             end  
-            colbar.Label.Interpreter='LaTex'; colbar.Label.String=str_colorbar_label; 
-            colbar.Label.Units='normalized';  colbar.Label.Position=[-0.1 -0.2]; % posjTion relative to colorbar
+            colbar.Label.Interpreter='LaTex'; colbar.Label.String=str_colorbar_label; % colorbar label
+            colbar.Label.Units='normalized';  colbar.Label.Position=pos_label;        % position of label relative to colorbar
             colbar.FontSize=15; colbar.Label.FontSize=18;
-        else
-        end   
 
-        drawnow;
-
-     end
-    t = annotation('textbox',[0.003 0.7 0.1 0.062],'String',type_model{1},'interpreter', 'latex','fontsize',fontsize,'EdgeColor',[0.0 0 0.0],'LineStyle',lstyle{1},'Linewidth',linew); t.HorizontalAlignment = 'center';
-    t = annotation('textbox',[0.003 0.38 0.1 0.062],'String',type_model{2},'interpreter', 'latex','fontsize',fontsize,'EdgeColor',[0.0 0 0.0],'LineStyle',lstyle{2},'Linewidth',linew); t.HorizontalAlignment = 'center';
-    t = annotation('textbox',[0.003 0.165 0.1 0.062],'String',type_model{3},'interpreter', 'latex','fontsize',fontsize,'EdgeColor',[0.0 0 0.0],'LineStyle',lstyle{3},'Linewidth',linew); t.HorizontalAlignment = 'center';
-
-  fprintf(' DONE \n\n')
+        end
+    
 end
+
