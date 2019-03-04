@@ -70,7 +70,7 @@ function [xh,yh,csh,phih] = fluctuations(z_out,par)
     phih=yh./(1+dQdphi);
     csh = xh/M; 
     
-    fprintf('... DONE \n\n')
+    if (strcmp(par.verb,'on')==1); fprintf('... DONE \n\n'); end;
     
         function deriv = ode(z,y,par)
             xh = y(1);

@@ -45,7 +45,7 @@ z_out = 1; % z-coordinate for computation of the results
 time_window = [-1000. 0.];  % Time window for extracting data in SL-record
 tp_min      = 1;            % Minimum sampling period in Fourier Transform
 
-[SL,SLrecord_window] = Func_ReadSLrecord_cutF('Siddall_2010.txt',time_window,tp_min);
+[SL] = ReadSLrecord('Siddall_2010.txt',time_window,tp_min);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Computation of response to SL record %----------%
@@ -107,14 +107,25 @@ save(datafile,'MODEL','-v7.3');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [SL,SLrecord_window] = Func_ReadSLrecord_cutF(filename,time_window,tp_min);
+function [SL] = ReadSLrecord(filename,timew,tp_min);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% READSLRECORD Reads sea-level record from .txt file 
+%   Inputs
+%      filename : name of the .txt file containing the sl record 
+%      timew    : time window on which extract data from the sl record
+%      tp_min   : minimum period in Fourier Transform
+%   Outputs
+%       SL      : structure array containing information on time-series sampling and 
+%                 SL-Fourier Transform
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     fprintf('\n.... Reading Time Series of SL in %s...\n',filename);
     SLrecord_all = load(filename);
 
     % Extract Time-Series of SL between t1 and t2 (t1>0, t2>0 and t1<t2)
-    [~,idx_start] = min(abs((SLrecord_all(:,1))-time_window(1)));
-    [~,idx_end] = min(abs((SLrecord_all(:,1))-time_window(2)));
+    [~,idx_start] = min(abs((SLrecord_all(:,1))-timew(1)));
+    [~,idx_end] = min(abs((SLrecord_all(:,1))-timew(2)));
     
     SLrecord_window(:,1)  = SLrecord_all(idx_start:idx_end,1);
     SLrecord_window(:,2)  = SLrecord_all(idx_start:idx_end,2) - mean(SLrecord_all(idx_start:idx_end,2)); % SL relative to present-day SL

@@ -1,6 +1,8 @@
 % % % MIT Licence
 % % % 
 % % % Copyright (c) 2019
+% % %     Nestor G. Cerpa       (University of Montpellier) [nestor.cerpa@gm.univ-montp2.fr]
+% % %     David W. Rees Jones   (University of Oxford)      [david.reesjones@earth.ox.ac.uk]
 % % %     Richard F. Katz       (University of Oxford)      [richard.katz@earth.ox.ac.uk] 
 % % % 
 % % % Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,6 +24,8 @@
 % % % SOFTWARE.
 
 function F = dft(y)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DFT   Discrete Fourier transform
 %   DFT(Y) computes the Discrete Fourier transform of an input
 %   time-series Y.  F=DFT(Y) uses the built-in FFT and returns a
@@ -30,6 +34,7 @@ function F = dft(y)
 %     F.alpha  = coefficients of cosine terms for k=1:Nyquist
 %     F.beta   = coefficients of the sine terms for k=1:Nyquist
 %     F.power  = normalised power-spectrum of the time-series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   %1. Compute the discrete Fourier transform using Matlab's fft
   G = fft(y);
