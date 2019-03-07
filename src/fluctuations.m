@@ -66,8 +66,8 @@ function [xh,yh,csh,phih] = fluctuations(z_out,par)
     xh=deval(z_out,sol,1);
     yh=deval(z_out,sol,2);
     [~,~,~,phi,~,~] = mean_analytical(z_out,par);
-    dQdphi =  Q*(n*phi.^(n-1).*(1-phi).^2 - 2*(1-phi).*phi.^n); 
-    phih=yh./(1+dQdphi);
+    dQdphi =  Q*(n*phi.^(n-1).*(1-phi).^2 - 2*(1-phi).*phi.^n)+1; 
+    phih=yh./dQdphi;
     csh = xh/M; 
     
     if (strcmp(par.verb,'on')==1); fprintf('... DONE \n\n'); end;
@@ -76,8 +76,8 @@ function [xh,yh,csh,phih] = fluctuations(z_out,par)
             xh = y(1);
             yh = y(2);
             [x,y,~,phi,dx,dy] = mean_analytical(z,par);
-            dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n);
-            phih=yh/(1+dQdphi);
+            dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n)+1;
+            phih=yh/dQdphi;
             if (strcmp(par.RHSODE,'on')==1)
                 dxh = (D+x+y)^(-1) *( 1i*w*G*x - xh*(1i*w*(D+phi+x)+dy) - yh*dx);
                 dyh = 1i*w*(xh-G-phih) +dxh;
