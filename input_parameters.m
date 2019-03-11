@@ -41,7 +41,7 @@ function par=input_parameters()
     par.D_vol  = 1e-4;   % Partition coefficient of carbon
     par.Fmax   = 0.2;    % Maximum degree of melting
     par.n      = 2;      % Exponent for permeability-porosity relationship
-    par.RHSODE ='on';    % Option to turn off RHS in ODEs solver
+    par.Gammap ='on';    % Option to turn off effect of SL-changes in ODEs solver
 
     %----------% Spatial and time parameters %----------%
     par.tp   = 100.e3;  % Period of forging             [yr]

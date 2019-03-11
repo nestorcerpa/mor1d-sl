@@ -39,7 +39,10 @@ zarray = linspace(0,1,par.nz);
 
 %----------% Parameters for computation of admittance %----------%
 
-Q_array = [par.Q par.Q/4]; % Use two values of \mathcal{Q}
+%%%         Wet         Wet         Wet         Dry         Dry Basal
+Q_array  = [par.Q       4*par.Q     par.Q/4     par.Q       par.Q]; 
+Harray   = [par.H       par.H       par.H       par.Hdry    par.Hdry];
+RHSarray = {'on'        'on'        'on'        'on'        'off'}; 
 nQs = length(Q_array);
 
 tp_array = [1:1:50     52:2:100     105:5:200]; % Define forcing periods
@@ -49,8 +52,12 @@ ntps = length(tp_array);
 par.verb = "off";
 for iQ = 1:nQs
     
-    fprintf('\n ### Calculating admittance for Q=%4.1e ... \n', Q_array(iQ));
+    fprintf('\n ### Calculating admittance for model series : %2d ... \n', iQ);
     par.Q = Q_array(iQ); 
+    par.G = par.Fmax*Harray(iQ)/par.Hdry;
+    par.M = par.Fmax*(Harray(iQ)/par.Hdry - 1) + 1e-8; 
+    par.Gammap = RHSarray{iQ};
+    fprintf(' --->  Q=%6.1e ; Gamma=%4.1f ; M=%4.1f ; Gamma_p=%s \n',par.Q,par.G,par.M,par.Gammap)
     
     for itp = 1:ntps
         
@@ -67,25 +74,32 @@ for iQ = 1:nQs
         %----------% Calculate mean variables %----------%
         [~,~,MFields.cs,MFields.phi,~,~]     = mean_analytical(zarray,par); 
         %----------% Get other mean variables %----------%
-        [MFields.W,MFields.f,MFields.fc]    = get_other_mfields(MFields.phi,MFields.cs,par);
+        [MFields.W,MFields.q,MFields.qc]    = get_other_mfields(MFields.phi,MFields.cs,par);
         %----------% Calculate fluctuating variables %----------%
         [~,~,FFields.csh,FFields.phih]       = fluctuations(zarray,par);
         %----------% Get other fluctuating variables %----------%
-        [FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
+        [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
         %----------%%----------%%----------%%----------%
         %----------%    Saving results      %----------%
         %----------%%----------%%----------%%----------%
 
+        % Parameters array
         data.par_array(iQ,itp)       = par;
+        % Fields at top of the column
         data.MFieldsTop.phi(iQ,itp)  = MFields.phi(end); 
         data.MFieldsTop.cs(iQ,itp)   = MFields.cs(end);
-        data.MFieldsTop.f(iQ,itp)    = MFields.f(end);
-        data.MFieldsTop.fc(iQ,itp)   = MFields.fc(end);
+        data.MFieldsTop.q(iQ,itp)    = MFields.q(end);
+        data.MFieldsTop.qc(iQ,itp)   = MFields.qc(end);
         data.FFieldsTop.phih(iQ,itp) = FFields.phih(end); 
         data.FFieldsTop.csh(iQ,itp)  = FFields.csh(end);
-        data.FFieldsTop.fh(iQ,itp)   = FFields.fh(end);
-        data.FFieldsTop.fch(iQ,itp)  = FFields.fch(end);
+        data.FFieldsTop.qh(iQ,itp)   = FFields.qh(end);
+        data.FFieldsTop.qch(iQ,itp)  = FFields.qch(end);
+        % Bottom to Surface lag
+        uwrp_bot_to_surf  =  unwrap(-angle(FFields.phih) + pi); data.lagBotToSurf.phi(iQ,itp) = uwrp_bot_to_surf(end)*tp_array(itp)/(2*pi);
+        uwrp_bot_to_surf  =  unwrap(-angle(FFields.csh));       data.lagBotToSurf.cs(iQ,itp)  = uwrp_bot_to_surf(end)*tp_array(itp)/(2*pi);
+        uwrp_bot_to_surf  =  unwrap(-angle(FFields.qh) + pi);   data.lagBotToSurf.q(iQ,itp)   = uwrp_bot_to_surf(end)*tp_array(itp)/(2*pi);
+        uwrp_bot_to_surf  =  unwrap(-angle(FFields.qch) + pi);  data.lagBotToSurf.qc(iQ,itp)  = uwrp_bot_to_surf(end)*tp_array(itp)/(2*pi);        
         
     end
     

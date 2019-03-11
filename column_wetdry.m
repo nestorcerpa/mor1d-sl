@@ -59,7 +59,7 @@ for iH = 1:length(Harray)
     %----------% Updating parameters %----------%
     par.G = par.Fmax*Harray(iH)/par.Hdry;
     par.M = par.Fmax*(Harray(iH)/par.Hdry - 1) + epsM; 
-    par.RHSODE = RHSarray{iH};
+    par.Gammap = RHSarray{iH};
     
     %----------% Calculate mean variables %----------%
     [~,~,MFields.c,MFields.phi,~,~] = mean_analytical(zarray,par); %calculate base state analytically

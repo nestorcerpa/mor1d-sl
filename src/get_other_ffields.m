@@ -23,7 +23,7 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function [Wh,fh,fch] = get_other_ffields(phib,csb,phih,csh,par)
+function [Wh,qh,qch] = get_other_ffields(phim,csm,phih,csh,par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GET_OTHER_FFIELDS Calculates base state variables and derivative
@@ -31,14 +31,14 @@ function [Wh,fh,fch] = get_other_ffields(phib,csb,phih,csh,par)
 %       par : array with model parameters
 %             par.Q : \mathcal{Q} 
 %             par.n : n
-%       csb  : mean carbon concentration in solid \bar{c}_s
-%       phib : mean porosity \bar{\phi}
+%       csm  : mean carbon concentration in solid \bar{c}_s
+%       phim : mean porosity \bar{\phi}
 %       csh  : fluctuating carbon concentration in solid \hat{c_s}
 %       phih : fluctuating porosity \hat{\phi} 
 %   Outputs
 %       Wh   : fluctuating solid velocity \hat{W}
-%       fh   : fluctuating melt flux \hat{f}
-%       fch  : fluctuating carbon flux \hat{f}_c
+%       qh   : fluctuating melt flux \hat{q}
+%       qch  : fluctuating carbon flux \hat{q}_c
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     Q = par.Q;
@@ -47,14 +47,14 @@ function [Wh,fh,fch] = get_other_ffields(phib,csb,phih,csh,par)
     %----------% Fluctuating Solid velocity %----------%
     %   \hat{W} = \cal{Q} (\bar{[phi}^n \hat{\phi} - n \hat{\phi}\bar{\phi}^(n-1)*(1-\bar{\phi}))
     %
-    Wh = Q * (phib.^n .* phih - n * phih .* phib.^(n-1) .* (1-phib));
+    Wh = Q * (phim.^n .* phih - n * phih .* phim.^(n-1) .* (1-phim));
     
     %----------% Fluctuating melt flux %----------% 
-    Wb = 1 - Q .* phib.^n.*(1-phib); % \bar{W}
-    fh = -(1-phib).*Wh + Wb .* phih;
+    Wm = 1 - Q .* phim.^n.*(1-phim);  % \bar{W}
+    qh = -(1-phim).*Wh + Wm .* phih;
 
     %----------% Fluctuating chemical flux %----------% 
-    fb = 1 - (1-phib).*Wb;
-    fch = (csb.*fh + fb.*csh)/par.D_vol;
+    qb = 1 - (1-phim).*Wm;
+    qch = (csm.*qh + qb.*csh)/par.D_vol;
     
 end

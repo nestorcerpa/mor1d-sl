@@ -78,10 +78,10 @@ function [xh,yh,csh,phih] = fluctuations(z_out,par)
             [x,y,~,phi,dx,dy] = mean_analytical(z,par);
             dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n)+1;
             phih=yh/dQdphi;
-            if (strcmp(par.RHSODE,'on')==1)
+            if (strcmp(par.Gammap,'on')==1)
                 dxh = (D+x+y)^(-1) *( 1i*w*G*x - xh*(1i*w*(D+phi+x)+dy) - yh*dx);
                 dyh = 1i*w*(xh-G-phih) +dxh;
-            elseif (strcmp(par.RHSODE,'off')==1)
+            elseif (strcmp(par.Gammap,'off')==1)
                 dxh = (D+x+y)^(-1) *(- xh*(1i*w*(D+phi+x)+dy) - yh*dx);
                 dyh = 1i*w*(xh-phih) +dxh;            
             end

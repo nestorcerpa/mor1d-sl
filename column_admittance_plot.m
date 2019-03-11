@@ -80,8 +80,8 @@ for iQ=params_to_plot
     
     fprintf('Plotting admittance for Q=%4.1e \n',par_array(iQ,1).Q);
     
-    RelAdm_FLUX = par_array(iQ,1).delta0*abs(FFieldsTop.fh(iQ,:))./MFieldsTop.f(iQ);  
-    RelAdm_ECO2 = par_array(iQ,1).delta0*abs(FFieldsTop.fch(iQ,:))./MFieldsTop.fc(iQ);
+    RelAdm_FLUX = par_array(iQ,1).delta0*abs(FFieldsTop.qh(iQ,:))./MFieldsTop.q(iQ);  
+    RelAdm_ECO2 = par_array(iQ,1).delta0*abs(FFieldsTop.qch(iQ,:))./MFieldsTop.qc(iQ);
     
     plot(SF_Af,tperiod(:),RelAdm_FLUX(:)*100,'LineWidth',linew,'color',col_FLUX); hold on;
     plot(SF_Af,tperiod(1:step_marker:end),RelAdm_FLUX(1:step_marker:end)*100,'LineWidth',linew,'LineStyle','none','Marker',mstyle{iQ},'MarkerSize',20,'color',col_FLUX); hold on;
@@ -106,8 +106,8 @@ for iQ=params_to_plot
 
     fprintf('Plotting Lag for Q=%4.1e \n',par_array(iQ,1).Q);
 
-    lag_f  = (wrapTo2Pi(-angle(FFieldsTop.fh(iQ,:))) - pi/2).*tperiod/(2*pi);
-    lag_fc = (wrapTo2Pi(-angle(FFieldsTop.fch(iQ,:))) - pi/2).*tperiod/(2*pi);
+    lag_q  = (wrapTo2Pi(-angle(FFieldsTop.qh(iQ,:))) - pi/2).*tperiod/(2*pi);
+    lag_qc = (wrapTo2Pi(-angle(FFieldsTop.qch(iQ,:))) - pi/2).*tperiod/(2*pi);
 
     if (iQ==1) 
         hold('on');
@@ -117,10 +117,10 @@ for iQ=params_to_plot
         grid(SF_Af,'on'); SF_Af.XMinorGrid='on'; SF_Af.YMinorGrid='on';
     end
      
-    plot(SF_Af,tperiod(:),lag_f,'LineWidth',linew,'color',col_FLUX); hold on;
-    plot(SF_Af,tperiod(1:step_marker:end),lag_f(1:step_marker:end),'LineWidth',linew,'LineStyle','none','Marker',mstyle{iQ},'MarkerSize',20,'color',col_FLUX); hold on;
-    plot(SF_Af,tperiod(:),lag_fc,'LineWidth',linew,'color',col_ECO2); hold on;
-    plot(SF_Af,tperiod(1:step_marker:end),lag_fc(1:step_marker:end),'LineWidth',linew,'LineStyle','none','Marker',mstyle{iQ},'MarkerSize',20,'color',col_ECO2); hold on;
+    plot(SF_Af,tperiod(:),lag_q,'LineWidth',linew,'color',col_FLUX); hold on;
+    plot(SF_Af,tperiod(1:step_marker:end),lag_q(1:step_marker:end),'LineWidth',linew,'LineStyle','none','Marker',mstyle{iQ},'MarkerSize',20,'color',col_FLUX); hold on;
+    plot(SF_Af,tperiod(:),lag_qc,'LineWidth',linew,'color',col_ECO2); hold on;
+    plot(SF_Af,tperiod(1:step_marker:end),lag_qc(1:step_marker:end),'LineWidth',linew,'LineStyle','none','Marker',mstyle{iQ},'MarkerSize',20,'color',col_ECO2); hold on;
 
 end
 %----------%%----------% Legend %----------%%----------%

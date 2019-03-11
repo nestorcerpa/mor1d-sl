@@ -23,7 +23,7 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function [W,f,fc] = get_other_mfields(phi,cs,par)
+function [W,q,qc] = get_other_mfields(phi,cs,par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % GET_OTHER_MFIELDS Calculates base state variables and derivative
@@ -35,8 +35,8 @@ function [W,f,fc] = get_other_mfields(phi,cs,par)
 %       phi : mean porosity \bar{\phi}
 %   Outputs
 %       W   : mean solid velocity \bar{W}
-%       f   : mean melt flux \bar{f}
-%       fc  : mean carbon flux \bar{f}_c
+%       q   : mean melt flux \bar{q}
+%       qc  : mean carbon flux \bar{q}_c
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     Q = par.Q;
@@ -46,9 +46,9 @@ function [W,f,fc] = get_other_mfields(phi,cs,par)
     W  = 1 - Q .* (phi.^n.*(1-phi)); % \bar{W}
     
     %----------% Mean melt flux %----------% 
-    f  = 1 - (1-phi).*W;
+    q  = 1 - (1-phi).*W;
     
     %----------% Mean chemical flux %----------% 
-    fc = f.*cs/par.D_vol;
+    qc = q.*cs/par.D_vol;
     
 end

@@ -48,11 +48,11 @@ nperiods = 2; % number of fluctuating-periods to plot in z-t space
 [~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(zarray,par); %calcuate base state analytically
 
 %----------% Get other mean variables %----------%
-[MFields.W,MFields.f,MFields.fc] = get_other_mfields(MFields.phi,MFields.cs,par);
+[MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
     
 %----------% Calculate fluctuations %----------%
 [~,~,FFields.csh,FFields.phih] = fluctuations(zarray,par);
-[FFields.Wh,FFields.fh,FFields.fch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
+[FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,20 +115,18 @@ function plot_meanfields(nfig,MFields,zarray,par,linew,fontsize)
     grid(F01,'on'); set(F01,'XMinorGrid','on','YMinorGrid','on'); 
     
     %----------% Melt flux %----------%
-    f = 1. + (1.0 - MFields.phi).*(par.Q .* (MFields.phi.^par.n) .* (1.-MFields.phi) - 1.0);
     p(1,3).select(); F01=gca; 
-    semilogx(F01,f,zarray,'k','linewidth',linew); hold(F01,'on');
-    xlabel(F01,'$\overline{f}$','Fontsize',fontsize);
+    semilogx(F01,MFields.q,zarray,'k','linewidth',linew); hold(F01,'on');
+    xlabel(F01,'$\overline{Q}$','Fontsize',fontsize);
     set(F01,'ylim',[0 1],'Ytick',0:0.25:1)
     set(F01,'YtickLabel',[]);       
     set(F01,'Box','on');
     grid(F01,'on'); set(F01,'XMinorGrid','on','YMinorGrid','on');  
     
     %----------% Chemical flux %----------%
-    fc = MFields.cs/par.D_vol .* f;
     p(1,4).select(); F01=gca; 
-    semilogx(F01,MFields.fc,zarray,'k','linewidth',linew); hold(F01,'on');
-    xlabel(F01,'$\overline{f_c}$','Fontsize',fontsize);
+    semilogx(F01,MFields.qc,zarray,'k','linewidth',linew); hold(F01,'on');
+    xlabel(F01,'$\overline{Q}_c$','Fontsize',fontsize);
     set(F01,'ylim',[0 1],'Ytick',0:0.25:1)
     set(F01,'yaxislocation','right');       
     set(F01,'Box','on');
@@ -235,8 +233,8 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
 
     phip  = par.delta0*real(exp(1i*par.omega*t')*FFields.phih);              % time-dependent fluctuating porosity
     clp   = par.delta0*real(exp(1i*par.omega*t')*FFields.csh/par.D_vol);     % time-dependent fluctuating liquid concentration
-    fp    = par.delta0*real(exp(1i*par.omega*t')*FFields.fh);                % time-dependent fluctuating melt flux
-    fcp   = par.delta0*real(exp(1i*par.omega*t')*FFields.fch);               % time-dependent fluctuating chemical flux
+    fp    = par.delta0*real(exp(1i*par.omega*t')*FFields.qh);                % time-dependent fluctuating melt flux
+    fcp   = par.delta0*real(exp(1i*par.omega*t')*FFields.qch);               % time-dependent fluctuating chemical flux
     
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -299,7 +297,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     plot(F01,t,(clp(:,end)-mean(clp(:,end)))./(max(clp(:,end))),'-','linewidth',linew,'color',[1 0 0]);
     set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange,'XTickLabel',[]);
     set(F01,'Ylim',[-1 1],'Ytick',[-1 0 1],'YTickLabel',[]);
-    if (strcmp(par.RHSODE,'on')==1)
+    if (strcmp(par.Gammap,'on')==1)
         set(F01,'YTickLabel',[]);
     else
         set(F01,'YTickLabel',[],'YAxisLocation','right');
@@ -316,7 +314,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     plot(F01,t,(fp(:,end)-mean(fp(:,end)))./(max(fp(:,end))),'-','linewidth',linew,'color',[0 0 1]);
     set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange,'XTickLabel',[]);
     set(F01,'Ylim',[-1 1],'Ytick',[-1 0 1],'YTickLabel',[]);
-    if (strcmp(par.RHSODE,'on')==1)
+    if (strcmp(par.Gammap,'on')==1)
         set(F01,'YTickLabel',[]);
     else
         set(F01,'YTickLabel',[],'YAxisLocation','right');
@@ -388,7 +386,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     %------------%%------------%  PLOT MELT FLUX  %------------%%------------%
     
     [fp_m,logscale,ticks_rescaled] = log_negative(fp,fprange2); % Rescale field to display log of negative values
-    str_colorbar_label = sprintf('$f^{\\prime}$');              % Label of field  
+    str_colorbar_label = sprintf('$Q^{\\prime}$');              % Label of field  
     
     p(2,3).select(); F01=gca;
 
@@ -411,7 +409,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     %------------%%------------%  PLOT CARBON FLUX  %------------%%------------%
     
     [fcp_m,logscale,ticks_rescaled] = log_negative(fcp,fcprange2); % Rescale field to display log of negative values
-    str_colorbar_label = sprintf('$f_c^{\\prime}$');               % Label of field  
+    str_colorbar_label = sprintf('$Q_c^{\\prime}$');               % Label of field  
    
     p(2,4).select(); F01=gca;
 
