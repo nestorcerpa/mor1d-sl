@@ -51,13 +51,13 @@ Consequences of sea-level variations during glacial cycles for magmatism and car
 ## CODE SUMMARY: 
 * All functions needed to compute the 1-d melting column models are provided in src/
 * The model parameters are defined in input_parameters.m
-* Data files used for plotting Figures 6 and 7 are provided 
+* Data files used for plotting Figures 5, 8 and 9 are provided 
 
 ## INSTRUCTIONS:
 1. To generate Figures 2 and 3 from the EPSL paper : Run mor1d.m
-2. To generate Figures 4 and 5 from the EPSL paper : Run column_wetdry.m
-3. To generate Figure 6 from the EPSL paper : Run column_admittance_plot.m (to re-calculate data used by the script : run column_admittance_compute.m) 
-4. To generate Figure 7 from the EPSL paper : Run column_slrecord_plot.m (to re-calculate data used by the scipt : run column_slrecord_compute.m)
+2. To generate Figures 4, 6(a,b,c) and 7(a,b,c) from the EPSL paper : Run mor1d_wetdry_fluxes.m
+3. To generate Figure 5 from the EPSL paper : Run mor1d_admittance_plot.m (to re-calculate data used by the script : run mor1d_admittance_compute.m) 
+4. To generate Figures 8 and 9 from the EPSL paper : Run mor1d_slrecord_plot.m (to re-calculate data used by the scipt : run mor1d_slrecord_compute.m)
 
 ## Additional notes 
 
