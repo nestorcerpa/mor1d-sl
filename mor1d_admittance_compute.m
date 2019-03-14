@@ -45,7 +45,7 @@ Harray   = [par.H       par.H       par.H       par.Hdry    par.Hdry];
 RHSarray = {'on'        'on'        'on'        'on'        'off'}; 
 nQs = length(Q_array);
 
-tp_array = [1:1:50     52:2:100     105:5:200]; % Define forcing periods
+tp_array = [1:2]; % Define forcing periods
 ntps = length(tp_array);
 
 %----------% Loop over models %----------%
@@ -54,9 +54,18 @@ for iQ = 1:nQs
     
     fprintf('\n ### Calculating admittance for model series : %2d ... \n', iQ);
     par.Q = Q_array(iQ); 
-    par.G = par.Fmax*Harray(iQ)/par.Hdry;
-    par.M = par.Fmax*(Harray(iQ)/par.Hdry - 1) + 1e-8; 
     par.Gammap = RHSarray{iQ};
+    par.H = Harray(iQ);
+    
+    %----------% Derive other reference parameters %----------%
+    par.t0   = par.H*1e3/(par.W0*1e-2); % time scale [yr]
+
+    %----------% Define other dimensionless parameters %----------%
+    par.Deff    = par.D_vol/(1-par.D_vol);          % $D$
+    par.G       = par.Fmax*(par.H/par.Hdry);        % $\Gamma^*$
+    par.M       = par.Fmax*(par.H/par.Hdry - 1);    % $\mathcal{M}$
+    par.delta0  = par.S0/(par.H*1e3)*par.rhow/par.rhom;
+    
     fprintf(' --->  Q=%6.1e ; Gamma=%4.1f ; M=%4.1f ; Gamma_p=%s \n',par.Q,par.G,par.M,par.Gammap)
     
     for itp = 1:ntps
