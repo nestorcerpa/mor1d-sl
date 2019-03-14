@@ -45,7 +45,7 @@ Harray   = [par.H       par.H       par.H       par.Hdry    par.Hdry];
 RHSarray = {'on'        'on'        'on'        'on'        'off'}; 
 nQs = length(Q_array);
 
-tp_array = [1:2]; % Define forcing periods
+tp_array = [1:1:50     52:2:100     105:5:200]; % Define forcing periods
 ntps = length(tp_array);
 
 %----------% Loop over models %----------%
