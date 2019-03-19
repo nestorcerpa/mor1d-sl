@@ -31,6 +31,7 @@ function par=input_parameters()
 %       par : array with model parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    fprintf('\n READING PARAMETERS IN INPUT_PARAMETERS() ...\n');
 
     %----------%%----------%%----------%%----------%
     %----------% MODEL INPUT PARAMETERS %----------%
@@ -57,27 +58,6 @@ function par=input_parameters()
     par.Q       = 1e5;  % $\mathcal{Q}$
     
     
-    
-    %----------%%----------%%----------%%----------%
-    %----------% ## OTHER MODEL PARAMETERS ## %----------%
-    %----------%%----------%%----------%%----------%
-    
-    %----------% Derive other reference parameters %----------%
-    par.t0   = par.H*1e3/(par.W0*1e-2); % time scale [yr]
-
-    %----------% Define other dimensionless parameters %----------%
-    par.Deff    = par.D_vol/(1-par.D_vol);          % $D$
-    par.G       = par.Fmax*(par.H/par.Hdry);        % $\Gamma^*$
-    par.M       = par.Fmax*(par.H/par.Hdry - 1);    % $\mathcal{M}$
-    par.omega   = 2.*pi/par.tp*par.t0;              % $\omega$
-    par.delta0  = par.S0/(par.H*1e3)*par.rhow/par.rhom;
-    
-    %----------% Spatial and time arrays %----------%
-    par.nz = 2000;
-    par.ntime = 1000;
-    
-    
-    
     %----------%%----------%%----------%
     %----------%   OPTIONS  %----------%
     %----------%%----------%%----------%
@@ -88,21 +68,17 @@ function par=input_parameters()
 
     %----------% Miscellaneous options %----------%
     par.verb='on';               % Verbosity
+         
+    %----------%%----------%%----------%%----------%
+    %----------% ## OTHER MODEL PARAMETERS ## %----------%
+    %----------%%----------%%----------%%----------%
     
-    %----------% Other useful parameters %----------%
-    par.cmyr_to_ms = 0.316881e-9;
-    par.sec_per_year = 31557600;
-       
+    %----------% Derive dimensionless parameters %----------%
+    par=get_dimensionless_parameters(par);
     
-    
-    %----------%%----------%%----------%%----------%%----------%
-    %----------%  ##  Display input parameters  ##  %----------%
-    %----------%%----------%%----------%%----------%%----------%
-    if (strcmp(par.verb,'on')==1)
-       fprintf('\n\n #-----# \t\t   INITIALIZATION OF MODEL PARAMETERS  \t\t   #-----#') 
-       fprintf('\n #-----# D = %4.1e ; Gamma = %4.2f ; M = %4.2f ; Q = %5.1e ; omega = %5.1f; #-----# \n\n',par.D_vol,par.G,par.M,par.Q,par.omega); 
-    end
-    
+    %----------% Spatial and time arrays %----------%
+    par.nz = 2000;
+    par.ntime = 1000;
     
     
     %----------%%----------%%----------%%----------%%----------%

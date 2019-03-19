@@ -54,6 +54,7 @@ col_FLUX = [0 0 1];
 col_ECO2 = [0.5 0 0.5];
 
 params_to_plot = [1 , 3];
+lins    = {'-';   ':';   '--'};
 
 tpmin = 0.0;
 step_marker = 8;
@@ -82,13 +83,13 @@ for iQ=params_to_plot
     RelAdm_FLUX = par_array(iQ,1).delta0*abs(FFieldsTop.qh(iQ,:))./MFieldsTop.q(iQ);  
     RelAdm_ECO2 = par_array(iQ,1).delta0*abs(FFieldsTop.qch(iQ,:))./MFieldsTop.qc(iQ);
     
-    plot(SF_Af,tperiod(:),RelAdm_FLUX(:)*100,'LineWidth',linew,'color',col_FLUX); hold on;
-    plot(SF_Af,tperiod(:),RelAdm_ECO2(:)*100,'--','LineWidth',linew,'color',col_ECO2); hold on;
+    plot(SF_Af,tperiod(:),2*RelAdm_FLUX(:)*100,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+    plot(SF_Af,tperiod(:),2*RelAdm_ECO2(:)*100,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
     
     if (iQ==1) 
         hold('on');
         ylabel(SF_Af,{'$A$ [\% per 100-m of SL change]'},'Fontsize',fontsize,'interpreter','latex');
-        set(SF_Af,'xlim',[0 200],'ylim',[0 10],'Fontsize',fontsize,'Box','on');
+        set(SF_Af,'xlim',[0 200],'ylim',[0 20],'Fontsize',fontsize,'Box','on');
         grid(SF_Af,'on'); SF_Af.XMinorGrid='on'; SF_Af.YMinorGrid='on';
     end
      
@@ -114,8 +115,8 @@ for iQ=params_to_plot
         grid(SF_Af,'on'); SF_Af.XMinorGrid='on'; SF_Af.YMinorGrid='on';
     end
      
-    plot(SF_Af,tperiod(:),lag_q,'LineWidth',linew,'color',col_FLUX); hold on;
-    plot(SF_Af,tperiod(:),lag_qc,'--','LineWidth',linew,'color',col_ECO2); hold on;
+    plot(SF_Af,tperiod(:),lag_q,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+    plot(SF_Af,tperiod(:),lag_qc,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
 
 end
 %----------%%----------% Legend %----------%%----------%

@@ -47,20 +47,18 @@ fcrange       = [-3  0]; % carbon flux
 
 %----------%  Defining model parameters array %----------%
 Harray   = [par.H  par.Hdry   par.Hdry];
-RHSarray = {'on'  'on'    'off'};
-epsM     = 1e-8; % to avoid singularity for M = 0
-
-tparray = [23 41 100]; % tp-array wjTh tp in kyr
+Gammap   = {'on'  'on'    'off'};
+tparray  = [23 41 100]; % tp-array wjTh tp in kyr
 
 %----------%  Loop over model parameters  %----------%
 par.verb = "off";
 for iH = 1:length(Harray)   
     
     %----------% Updating parameters %----------%
-    par.G = par.Fmax*Harray(iH)/par.Hdry;
-    par.M = par.Fmax*(Harray(iH)/par.Hdry - 1) + epsM; 
-    par.Gammap = RHSarray{iH};
-    
+    par.H = Harray(iH);                     % H value
+    par.Gammap = Gammap{iH};                % Turning on/off effects of sea-level induced pressure variations
+    par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+        
     %----------% Calculate mean variables %----------%
     [~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(zarray,par); %calculate base state analytically
     
@@ -69,7 +67,7 @@ for iH = 1:length(Harray)
         fprintf('\n Model %3d.%1d : H = %4.1f km, Tp = %4.1f kyr',iH,jT,Harray(iH),tparray(jT))
         
         par.tp    = tparray(jT)*1e3; 
-        par.omega = 2.*pi/par.tp*par.t0;
+        par=get_dimensionless_parameters(par);  % Updating dimensionless parameters (for omega)
         
         %----------% Get other mean variables %----------%
         [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
