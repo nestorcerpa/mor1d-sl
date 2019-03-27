@@ -68,7 +68,7 @@ function [csh,yh,phih] = fluctuations_dry(z_out,par)
     %----------% output
     csh=deval(z_out,sol,1);
     yh=deval(z_out,sol,2);
-    [~,~,~,phi,~,~] = mean_analytical(z_out,par);
+    [~,~,phi,~,~] = mean_analytical_dry(z_out,par);
     dQdphi =  Q*(n*phi.^(n-1).*(1-phi).^2 - 2*(1-phi).*phi.^n)+1; 
     phih=yh./dQdphi;
     
