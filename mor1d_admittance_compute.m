@@ -42,7 +42,7 @@ zarray = linspace(0,1,par.nz);
 %%%         Wet         Wet         Wet         Dry         Dry Basal
 Q_array  = [par.Q       4*par.Q     par.Q/4     par.Q       par.Q]; 
 Harray   = [par.H       par.H       par.H       par.Hdry    par.Hdry];
-Gammap   = {'on'        'on'        'on'        'on'        'off'}; 
+Burley   = {'off'       'off'       'off'       'off'       'on'}; 
 nQs = length(Q_array);
 
 tp_array = [1:1:50     52:2:100     105:5:200]; % Define forcing periods
@@ -54,11 +54,11 @@ for iQ = 1:nQs
     
     fprintf('\n ### Calculating admittance for model series : %2d ... \n', iQ);
     par.Q      = Q_array(iQ); 
-    par.Gammap = Gammap{iQ};
+    par.Burley = Burley{iQ};
     par.H      = Harray(iQ);
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
 
-    fprintf(' --->  H = %4.1f km; Q = %6.1e ; Gammap : %s \n',par.H,par.Q,par.Gammap)
+    fprintf(' --->  H = %4.1f km; Q = %6.1e ; Burley : %s \n',par.H,par.Q,par.Burley)
     
     for itp = 1:ntps
         

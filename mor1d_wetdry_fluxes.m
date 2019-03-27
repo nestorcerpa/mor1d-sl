@@ -47,7 +47,7 @@ fcrange       = [-3  0]; % carbon flux
 
 %----------%  Defining model parameters array %----------%
 Harray   = [par.H  par.Hdry   par.Hdry];
-Gammap   = {'on'  'on'    'off'};
+Burley   = {'off'  'off'    'on'};
 tparray  = [23 41 100]; % tp-array wjTh tp in kyr
 
 %----------%  Loop over model parameters  %----------%
@@ -56,7 +56,7 @@ for iH = 1:length(Harray)
     
     %----------% Updating parameters %----------%
     par.H = Harray(iH);                     % H value
-    par.Gammap = Gammap{iH};                % Turning on/off effects of sea-level induced pressure variations
+    par.Burley = Burley{iH};                % Turning on/off effects of sea-level induced pressure variations
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
         
     %----------% Calculate mean variables %----------%
