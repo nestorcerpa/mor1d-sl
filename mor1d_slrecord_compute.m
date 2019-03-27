@@ -52,7 +52,7 @@ tp_min      = 1;            % Minimum sampling period in Fourier Transform
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------% Calculate mean state %----------%
-[~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(z_out,par); % calculate mean state analytically
+[MFields.cs,MFields.phi] = mean_analytical(z_out,par); % calculate mean state analytically
 %----------% Get other mean variables %----------%
 [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
 
@@ -79,7 +79,7 @@ for iperiod = 1:nperiod
     par.omega = 2.*pi/par.tp*par.t0;
 
     %----------% Calculate fluctuating variables %----------%
-    [~,~,FFields.csh,FFields.phih] = fluctuations(z_out,par);   % calculate fluctuating fields at z_out;
+    [FFields.csh,FFields.phih] = fluctuations(z_out,par);   % calculate fluctuating fields at z_out;
     %----------% Get other fluctuating variables %----------%
     [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 

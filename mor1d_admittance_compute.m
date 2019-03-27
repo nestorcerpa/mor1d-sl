@@ -73,11 +73,11 @@ for iQ = 1:nQs
         %----------%%----------%%----------%%----------%
 
         %----------% Calculate mean variables %----------%
-        [~,~,MFields.cs,MFields.phi,~,~]     = mean_analytical(zarray,par); 
+        [MFields.cs,MFields.phi]         = mean_analytical(zarray,par); 
         %----------% Get other mean variables %----------%
-        [MFields.W,MFields.q,MFields.qc]    = get_other_mfields(MFields.phi,MFields.cs,par);
+        [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
         %----------% Calculate fluctuating variables %----------%
-        [~,~,FFields.csh,FFields.phih]       = fluctuations(zarray,par);
+        [FFields.csh,FFields.phih]       = fluctuations(zarray,par);
         %----------% Get other fluctuating variables %----------%
         [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
