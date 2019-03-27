@@ -62,6 +62,10 @@ function [csh,yh,phih] = fluctuations_dry(z_out,par)
     z=0;
     [~,~,~,dcs0,dy0] = mean_analytical_dry(z,par);
     
+    if (strcmp(par.Burley,'on')==1)
+        dy0=0;
+    end
+    
     %----------% calculate fluctuating state
     sol = ode45(@(zi,y) ode(zi,y,par),[0 1],[-dcs0;-dy0],options);
 
@@ -80,12 +84,12 @@ function [csh,yh,phih] = fluctuations_dry(z_out,par)
             [cs,y,phi,dcs,dy] = mean_analytical_dry(z,par);
             dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n)+1;
             phih=yh/dQdphi;
-            if (strcmp(par.Gammap,'on')==1)
+           if (strcmp(par.Burley,'off')==1)
                 dcsh = (D+y)^(-1) *( 1i*w*G*cs - csh*(1i*w*(D+phi)+dy) - yh*dcs);
                 dyh = 1i*w*(-G-phih) ;
-            elseif (strcmp(par.Gammap,'off')==1)
-                dcsh = (D+y)^(-1) *(-csh*(1i*w*(D+phi)+dy) - yh*dcs);
-                dyh = 1i*w*(-phih);            
+            elseif (strcmp(par.Burley,'on')==1)
+                dcsh = (D+y)^(-1) *(-csh*(1i*w*(D+phi)+dy) );
+                dyh = 0;            
             end
             deriv = [dcsh;dyh];
         end

@@ -297,7 +297,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     plot(F01,t,(clp(:,end)-mean(clp(:,end)))./(max(clp(:,end))),'-','linewidth',linew,'color',[1 0 0]);
     set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange,'XTickLabel',[]);
     set(F01,'Ylim',[-1 1],'Ytick',[-1 0 1],'YTickLabel',[]);
-    if (strcmp(par.Gammap,'on')==1)
+    if (strcmp(par.Burley,'on')==1)
         set(F01,'YTickLabel',[]);
     else
         set(F01,'YTickLabel',[],'YAxisLocation','right');
@@ -314,7 +314,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     plot(F01,t,(fp(:,end)-mean(fp(:,end)))./(max(fp(:,end))),'-','linewidth',linew,'color',[0 0 1]);
     set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange,'XTickLabel',[]);
     set(F01,'Ylim',[-1 1],'Ytick',[-1 0 1],'YTickLabel',[]);
-    if (strcmp(par.Gammap,'on')==1)
+    if (strcmp(par.Burley,'on')==1)
         set(F01,'YTickLabel',[]);
     else
         set(F01,'YTickLabel',[],'YAxisLocation','right');
