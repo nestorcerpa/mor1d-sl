@@ -1,20 +1,20 @@
 % % % MIT Licence
-% % %
+% % % 
 % % % Copyright (c) 2019
 % % %     Nestor G. Cerpa       (University of Montpellier) [nestor.cerpa@gm.univ-montp2.fr]
 % % %     David W. Rees Jones   (University of Oxford)      [david.reesjones@earth.ox.ac.uk]
-% % %     Richard F. Katz       (University of Oxford)      [richard.katz@earth.ox.ac.uk]
-% % %
+% % %     Richard F. Katz       (University of Oxford)      [richard.katz@earth.ox.ac.uk] 
+% % % 
 % % % Permission is hereby granted, free of charge, to any person obtaining a copy
 % % % of this software and associated documentation files (the "Software"), to deal
 % % % in the Software without restriction, including without limitation the rights
 % % % to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 % % % copies of the Software, and to permit persons to whom the Software is
 % % % furnished to do so, subject to the following conditions:
-% % %
+% % % 
 % % % The above copyright notice and this permission notice shall be included in all
 % % % copies or substantial portions of the Software.
-% % %
+% % % 
 % % % THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 % % % IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 % % % FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,40 +23,39 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function [cs,y,phi,dcs,dy] = mean_analytical_dry(z,par)
+function [x,y,cs,phi,dx,dy] = mean_analytical_wet(z,par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MEAN_ANALYTICAL_DRY : Calculatesmean variables and derivatives
-%   Inputs
+% MEAN_ANALYTICAL_WET : Calculatesmean variables and derivatives
+%   Inputs 
 %       z   : depth (can be a scalar or vector)
 %       par : array with model parameters
 %         par.Deff : effective partition coefficient D=D/(1-D)
 %         par.G    : $\Gamma^*$
 %         par.M    : $\mathcal{M}$
 %         par.Q    : $\mathcal{Q}$
-%    Outputs
+%    Outputs 
+%       x   : change of variable x = Mc
+%       y   : change of variable y = phi + q(phi) 
 %       cs  : mean solid concentration
-%       y   : change of variable y = phi + q(phi)
 %       phi : mean porosity
-%       dcs  : spatial-derivative of cs
+%       dx  : spatial-derivative of x
 %       dy  : spatial-derivative of y
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-    D = par.Deff;
+    D = par.Deff; 
     G = par.G;
     M = par.M;
-    n = par.n;
-    Q = par.Q;
+    n = par.n; 
+    Q = par.Q;  
 
-    if M>1e-6
-        error('Error: not dry model, check par.M')
-    end
+    %----------% Calculate base state functions using quadratic formula 
+    f=D+G*z-M;
+    x=0.5*(-f+sqrt(f.^2+4*D*M));
+    y=G*z-M+x;
 
-    %----------% Calculate base state functions
-    y=G*z;
-
-    %----------% Determine phi (requires solution of an algebraic equation)
+    %----------% Determine phi (requires solution of an algebraic equation) 
     phi=zeros(size(y));
     for yt=y
         if n==2 %special case can be done with roots function
@@ -66,8 +65,6 @@ function [cs,y,phi,dcs,dy] = mean_analytical_dry(z,par)
             r_p=r_p(r_p<=1 & r_p>=0);
             if numel(r_p)~=1
                 disp(r_p)
-                disp(pol_p)
-                pause(0.1)
                 error('incorrect number of roots found in the range (0,1)')
             end
             phi(yt==y)=r_p;
@@ -87,11 +84,10 @@ function [cs,y,phi,dcs,dy] = mean_analytical_dry(z,par)
     end
 
     %----------% Calculate concentration (change variables)
-    cs=D./(D+y);
+    cs=x/M;
 
     %----------% Calculate derivatives
-    dcs=-cs*G./(D+G*z);
-    dy=G;
-
+    dx=-x*G./(2*x+f); 
+    dy=G+dx;
 
 end

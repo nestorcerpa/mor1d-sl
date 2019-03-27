@@ -23,71 +23,12 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function [xh,yh,csh,phih] = fluctuations(z_out,par)
+function [csh,phih] = fluctuations(z,par)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FLUCTUATIONS Calculates flucuating variables 
-%   Inputs
-%       z_out is set of depths at which outputs are evaluated (can be a scalar or vector)
-%       par : array with model parameters
-%         par.Deff : effective partition coefficient D=D/(1-D)
-%         par.G    : $\Gamma^*$
-%         par.M    : $\mathcal{M}$
-%         par.Q    : $\mathcal{Q}$
-%   Outputs
-%       xh   : $\hat{x}$=M/c;
-%       yh   : $\hat{y}$
-%       csh  : fluctuating carbon concentration in solid \hat{c_s}
-%       phih : fluctuating porosity \hat{\phi} 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   if (par.M<=1e-6)
+      [csh,~,phih] = fluctuations_dry(z,par);
+   else
+      [~,~,csh,phih] = fluctuations_wet(z,par); 
+   end
 
-    if strcmp(par.verb,'on')==1
-       fprintf('\n Solving ODEs for fluctuations ...\n') 
-    end
-    
-    D = par.Deff; 
-    G = par.G;
-    M = par.M;
-    n = par.n;
-    Q = par.Q;
-    w = par.omega;
-
-    %----------% specifiy ode45 options (relatively tight tolerances)
-    options = odeset('AbsTol',par.ODEopts.AbsTol,'RelTol',par.ODEopts.RelTol,'Stats',par.verb);
-
-    %----------% calculate mean state derivatives (needed for boundary conditions)
-    z=0;
-    [~,~,~,~,dx0,dy0] = mean_analytical(z,par);
-
-    %----------% calculate fluctuating state
-    sol = ode45(@(zi,y) ode(zi,y,par),[0 1],[-dx0;-dy0],options);
-
-    %----------% output
-    xh=deval(z_out,sol,1);
-    yh=deval(z_out,sol,2);
-    [~,~,~,phi,~,~] = mean_analytical(z_out,par);
-    dQdphi =  Q*(n*phi.^(n-1).*(1-phi).^2 - 2*(1-phi).*phi.^n)+1; 
-    phih=yh./dQdphi;
-    csh = xh/M; 
-    
-    if (strcmp(par.verb,'on')==1); fprintf('... DONE \n\n'); end;
-    
-        function deriv = ode(z,y,par)
-            xh = y(1);
-            yh = y(2);
-            [x,y,~,phi,dx,dy] = mean_analytical(z,par);
-            dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n)+1;
-            phih=yh/dQdphi;
-            if (strcmp(par.Gammap,'on')==1)
-                dxh = (D+x+y)^(-1) *( 1i*w*G*x - xh*(1i*w*(D+phi+x)+dy) - yh*dx);
-                dyh = 1i*w*(xh-G-phih) +dxh;
-            elseif (strcmp(par.Gammap,'off')==1)
-                dxh = (D+x+y)^(-1) *(- xh*(1i*w*(D+phi+x)+dy) - yh*dx);
-                dyh = 1i*w*(xh-phih) +dxh;            
-            end
-            deriv = [dxh;dyh];
-        end
-
- 
 end
-

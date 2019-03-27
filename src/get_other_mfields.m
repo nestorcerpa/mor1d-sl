@@ -43,10 +43,10 @@ function [W,q,qc] = get_other_mfields(phi,cs,par)
     n = par.n;
     
     %----------% Mean solid velocity %----------% 
-    W  = 1 - Q .* (phi.^n.*(1-phi)); % \bar{W}
+    W  = 1 - Q .* (phi.^n.*(1-phi));      % \bar{W}
     
     %----------% Mean melt flux %----------% 
-    q  = 1 - (1-phi).*W;
+    q  = Q .* (phi.^n.*(1-phi).^2) + phi; % \bar{Q}
     
     %----------% Mean chemical flux %----------% 
     qc = q.*cs/par.D_vol;

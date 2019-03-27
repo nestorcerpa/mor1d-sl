@@ -31,15 +31,13 @@ function par=get_dimensionless_parameters(par)
 %       par : array with model parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    epsM     = 1e-8;       % eosilon value to avoid singularity for M = 0
-
     %----------% Derive other reference parameters %----------%
     par.t0      = par.H*1e3/(par.W0*1e-2);          % time scale [yr]
 
     %----------% Define other dimensionless parameters %----------%
     par.Deff    = par.D_vol/(1-par.D_vol);              % $D$ : effective partition coeff.
     par.G       = par.Fmax*(par.H/par.Hdry);            % $\Gamma^*$
-    par.M       = par.Fmax*(par.H/par.Hdry - 1) + epsM; % $\mathcal{M}$
+    par.M       = par.Fmax*(par.H/par.Hdry - 1);        % $\mathcal{M}$
     par.omega   = 2.*pi/par.tp*par.t0;                  % $\omega$
     par.delta0  = par.S0/(par.H*1e3)*par.rhow/par.rhom;
    

@@ -45,13 +45,13 @@ nperiods = 2; % number of fluctuating-periods to plot in z-t space
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------% Calculate mean state %----------%
-[~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(zarray,par); %calcuate base state analytically
+[MFields.cs,MFields.phi] = mean_analytical(zarray,par); %calculate base state analytically
 
 %----------% Get other mean variables %----------%
 [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
     
 %----------% Calculate fluctuations %----------%
-[~,~,FFields.csh,FFields.phih] = fluctuations(zarray,par);
+[FFields.csh,FFields.phih] = fluctuations(zarray,par);
 [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
 
