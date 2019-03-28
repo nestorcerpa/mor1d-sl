@@ -23,12 +23,12 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function [csh,phih] = fluctuations(z,par)
+function [csh,phih,yh] = fluctuations(z,par)
 
    if (par.M<=1e-6)
-      [csh,~,phih] = fluctuations_dry(z,par);
+      [csh,yh,phih] = fluctuations_dry(z,par);
    else
-      [~,~,csh,phih] = fluctuations_wet(z,par); 
+      [~,yh,csh,phih] = fluctuations_wet(z,par); 
    end
 
 end

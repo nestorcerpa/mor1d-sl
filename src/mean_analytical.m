@@ -23,12 +23,11 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function [cs,phi] = mean_analytical(z,par);
-
+function [cs,phi,y] = mean_analytical(z,par);
    if (par.M<=1e-6)
-      [cs,~,phi,~,~] = mean_analytical_dry(z,par);
+      [cs,y,phi,~,~] = mean_analytical_dry(z,par);
    else
-      [~,~,cs,phi,~,~] = mean_analytical_wet(z,par); 
+      [~,y,cs,phi,~,~] = mean_analytical_wet(z,par); 
    end
 
 end
