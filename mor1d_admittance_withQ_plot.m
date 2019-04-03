@@ -29,6 +29,7 @@ close all; clear all;
 %----------%%----------% Reading data from  file %----------%%----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%----------% Loading files %----------%
 load('mor1d_admittance_withQ.mat');
 
 par_array  = data.par_array;
@@ -49,17 +50,17 @@ for iQ = 1:nQs
   
     Qarray(iQ) = par_array(iQ).Q; 
     
-    % Extract admittance values for t_p > min kyrs
+    %----------% Extract admittance values for t_p > min kyrs %----------%
     [xmin_min,idx_min] = min(abs(tperiod(:)*1e-3-tpmin)); 
     tperiod_m     = tperiod(idx_min:end);
     RelAdm_FLUX_m = par_array(iQ,1).delta0*abs(FFieldsTop.qh(iQ,:))./MFieldsTop.q(iQ);  
     RelAdm_ECO2_m = par_array(iQ,1).delta0*abs(FFieldsTop.qch(iQ,:))./MFieldsTop.qc(iQ);
         
-    % Determine value and time of peak admittance
+    %----------% Determine value and time of peak admittance %----------%
     [maxAq(iQ),idmaxAq] = max(RelAdm_FLUX_m); tmaxAq(iQ) = tperiod_m(idmaxAq);
     [maxAqc(iQ),idmaxAqc] = max(RelAdm_ECO2_m);tmaxAqc(iQ) = tperiod_m(idmaxAqc);
     
-    % Determine approximated value and time of peak admittance
+    %----------% Determine approximated value and time of peak admittance %----------%
     n        = par_array(iQ).n;
     phimax   = (par_array(iQ).Fmax/par_array(iQ).Q)^(1./n);
     w0       = par_array(iQ).W0*par_array(iQ).Fmax/phimax; % [cm/yr]
@@ -71,7 +72,7 @@ for iQ = 1:nQs
         
 end
 
-% Extracting prefactor for fitting data at \mathcal{Q} = 10^5.
+%----------% Extracting prefactor for fitting data at \mathcal{Q} = 10^5. %----------%
 [~,idx_Q1e5] = min(abs(Qarray-1e5));
 Bq  = (2*maxAq(idx_Q1e5))/Aqth(idx_Q1e5);
 Bqc = (2*maxAqc(idx_Q1e5))/Aqcth(idx_Q1e5);
@@ -123,10 +124,10 @@ Amaxlims = [0 45];
 
 p(1,1,1,1).select(); SF=gca; 
 
-%Plot calculated values
+%----------% Plot calculated values %----------%
 semilogx(SF,Qarray,2.*maxAq*100.,'o','markersize',marksize,'color',col_FLUX,'MarkerFaceColor',col_FLUX); hold on; 
 semilogx(SF,Qarray,2.*maxAqc*100.,'^','markersize',marksize,'color',col_ECO2,'MarkerFaceColor',col_ECO2); hold on; 
-%- Plot theoretical values
+%----------% Plot theoretical values %----------%
 semilogx(SF,Qarray,Bq*Aqth*100,'-','linewidth',linew,'color',col_FLUX); hold on;   leg1{1} = sprintf('$B_{\\mathcal{Q}}$=%4.2f',Bq);
 semilogx(SF,Qarray,Bqc*Aqcth*100,'-','linewidth',linew,'color',col_ECO2); hold on; leg1{2} = sprintf('$B_{\\mathcal{Q}_c}$=%4.2f',Bqc);
 
@@ -145,10 +146,10 @@ tmaxlims = [0 160];
 
 p(1,1,1,2).select(); SF=gca; 
 
-%Plot calculated values
+%----------% Plot calculated values %----------%
 semilogx(SF,Qarray,tmaxAq,'o','markersize',marksize,'color',col_FLUX,'MarkerFaceColor',col_FLUX); hold on; 
 semilogx(SF,Qarray,tmaxAqc,'^','markersize',marksize,'color',col_ECO2,'MarkerFaceColor',col_ECO2); hold on; 
-%- Plot theoretical values
+%----------% Plot theoretical values %----------%
 semilogx(SF,Qarray,Cq*tpqth,'-','linewidth',linew,'color',col_FLUX); hold on;      leg1{1} = sprintf('$C_{\\mathcal{Q}}$=%4.2f',Cq);
 semilogx(SF,Qarray,Cqc*tpqcth,'-','linewidth',linew,'color',col_ECO2); hold on;    leg1{2} = sprintf('$C_{\\mathcal{Q}_c}$=%4.2f',Cqc);
 

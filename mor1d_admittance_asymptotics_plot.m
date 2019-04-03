@@ -29,6 +29,7 @@ close all; clear all;
 %----------% Reading data from  file %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%----------% Loading files %----------%
 load('mor1d_admittance.mat');
 
 par_array  = data.par_array;
@@ -59,46 +60,80 @@ tpmin = 0.0;
 step_marker = 8;
 
 %----------%%----------% Initializing %----------%%----------% 
-nfig = nfig + 1; figure(nfig); set(nfig, 'Position', [500, 100, 380, 650]); fig1=nfig;
+nfig = nfig + 1; figure(nfig); set(nfig, 'Position', [200, 100, 650, 350]); 
 
 p = panel(nfig);
 
 % Create panel 2x3
-p.pack(2,1);
+p.pack(1,2);
 
-p.margin=[22 20 5 8]; %% margin[left bottom right top]
-p.de.margin = 10;
+p.margin=[18 20 3 8]; %% margin[left bottom right top]
+p.de.margin = 18;
 
 
 %----------%%----------% Plotting Admittance  %----------%%----------%
 fprintf('\n\n #-----# PLOTTING ADMITANCE AND LAG #-----# \n');
 
-p(1,1).select(); SF_Af=gca;  
+p(1,1).select(); SF=gca;  
 
 for iQ=params_to_plot
-    par=data.par_array(iQ);
-    Af_correction = (par.Deff+data.MFieldsTop.phi(1,end))/(par.Deff+data.MFieldsTop.phi(1,end)+data.MFieldsTop.cs(1,end)*par.M);
-    Af=par.n*par.S0/(par.Hdry*1e3)*par.rhow/par.rhom*par.Fmax^((par.n-1)/par.n)*par.Q^(1/par.n)*Af_correction;
-    Afc=(par.n-1)*par.S0/(par.Hdry*1e3)*par.rhow/par.rhom*par.Fmax^((par.n-1)/par.n)*par.Q^(1/par.n);
-    Imf=(par.n-1)*par.G*(par.Q/par.Fmax)^(1/par.n);
-    Imfc=(par.n-1/par.n)*par.G*(par.Q/par.Fmax)^(1/par.n);
-    omega=(2*pi*par.t0)./(tperiod*1e3);
     
     fprintf('Plotting admittance for Q=%4.1e \n',par_array(iQ,1).Q);
     
+    %----------% Parameters %----------%
+    par=data.par_array(iQ);
+    n = par.n;
+    D = par.Deff;
+    phibar = MFieldsTop.phi(iQ,end);
+    cbar   = MFieldsTop.cs(iQ,end)*par.M;
+    Qbar   = MFieldsTop.q(iQ,end);     
+    dQ_dphi = par.Q*(n*phibar^(n-1)*(1-phibar)^2 - 2*phibar^n*(1-phibar) ) + 1.0;    
+    w0 = par.W0*par.Fmax/((par.Fmax/par.Q)^(1/par.n));  % in cm/yr
+
+    %----------% Admittance analytic %----------%
+    % Admittance approximation
+    Afactor = (D+phibar)/(D+phibar+cbar);
+    Af0 = par.delta0*par.G/Qbar * (Afactor) * dQ_dphi;                          % Eq. (C.5)        
+    Afc0 = par.delta0*par.G*(Afactor*dQ_dphi./Qbar - 1./(D+phibar+cbar) );      % Eq. (C.7)
+    % Admittance approximation for D<<\phi<<1
+    Af_smallD  = n*par.delta0*par.Fmax^(1-1/n)*par.H/par.Hdry*par.Q^(1/n);      % Eq. (C.6)
+    Afc_smallD = (n-1)*par.delta0*par.Fmax^(1-1/n)*par.H/par.Hdry*par.Q^(1/n);  % Eq. (C.8)
+    % Phase approximation
+    Imf  = (n-1)*par.G*(par.Q/par.Fmax)^(1/n);
+    Imfc = ((n^2-2*n+1/n)/(n-1))*par.G*(par.Q/par.Fmax)^(1/n);
+    omega= (2*pi*par.t0)./(tperiod*1e3);
+
+    % Admittance from models
     RelAdm_FLUX = par_array(iQ,1).delta0*abs(FFieldsTop.qh(iQ,:))./MFieldsTop.q(iQ);  
     RelAdm_ECO2 = par_array(iQ,1).delta0*abs(FFieldsTop.qch(iQ,:))./MFieldsTop.qc(iQ);
+ 
+    %----------% Critical period %----------%
+    tp_star = 1/(n-1)*par.Hdry/(w0*1e-5)*1e-3;      % in kyr
+    plot(SF,[tp_star,tp_star],get(SF,'ylim'),'LineWidth',linew-1,'color','k','LineStyle','--'); hold on;
     
-    plot(SF_Af,tperiod(:),RelAdm_FLUX(:)*100,'LineWidth',linew,'color',col_FLUX); hold on;
-    plot(SF_Af,tperiod(:),RelAdm_ECO2(:)*100,'LineWidth',linew,'color',col_ECO2); hold on;
-      plot(SF_Af,tperiod(:),Af*100+zeros(size(tperiod)),'LineWidth',linew,'color',col_FLUX,'LineStyle','--'); hold on;
-    plot(SF_Af,tperiod(:),Afc*100+zeros(size(tperiod)),'LineWidth',linew,'color',col_ECO2,'LineStyle','--'); hold on;
-
+    %----------% Plotting admittance %----------%
+    % Melt flux
+    plot(SF,tperiod,2*RelAdm_FLUX(:)*100,'LineWidth',linew,'color',col_FLUX); hold on;
+    plot(SF,tperiod,2*Af0*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_FLUX,'LineStyle',':'); hold on;          % (C.5) 
+    plot(SF,tperiod,2*Afc0*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_ECO2,'LineStyle',':'); hold on;         % (C.7)
+    % Carbon flux
+    plot(SF,tperiod,2*RelAdm_ECO2(:)*100,'LineWidth',linew,'color',col_ECO2); hold on;
+    plot(SF,tperiod,2*Af_smallD*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_FLUX,'LineStyle','--'); hold on;   % (C.6)
+    plot(SF,tperiod,2*Afc_smallD*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_ECO2,'LineStyle','--'); hold on;  % (C.8)
+    
     if (iQ==1) 
+        
+        %----------% Axis appearance %----------%
         hold('on');
-        ylabel(SF_Af,{'$A$ [\% per 100-m of SL change]'},'Fontsize',fontsize,'interpreter','latex');
-        set(SF_Af,'XScale','log','YScale','log','xlim',[1 200],'ylim',[0 10],'Fontsize',fontsize,'Box','on');
-        grid(SF_Af,'on'); SF_Af.XMinorGrid='on'; SF_Af.YMinorGrid='on';
+        xlabel(SF,'$t_p$ [kyr]','Fontsize',fontsize,'interpreter','latex');
+        ylabel(SF,{'$A$ [\% per 100-m of SL change]'},'Fontsize',fontsize,'interpreter','latex');
+        set(SF,'XScale','log','YScale','log','xlim',[1 200],'ylim',[1 30],'Fontsize',fontsize,'Box','on');
+        grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
+        
+        %----------% Critical period %----------%
+        tp_star = 1/(par.n-1)*par.Hdry/(w0*1e-5)*1e-3;      % in kyr
+        plot(SF,[tp_star,tp_star],get(SF,'ylim'),'LineWidth',linew-1,'color','k','LineStyle','--'); hold on;
+        
     end
      
 end
@@ -106,30 +141,42 @@ end
 
 %----------%%----------% Plotting Lag  %----------%%----------%
 
-p(2,1).select(); SF_Af=gca;
+p(1,2).select(); SF=gca;
 
 for iQ=params_to_plot
-lag_f  = (wrapTo2Pi(-angle(FFieldsTop.qh(iQ,:))) - pi/2).*tperiod/(2*pi);
-    lag_fc = (wrapTo2Pi(-angle(FFieldsTop.qch(iQ,:))) - pi/2).*tperiod/(2*pi);
-    lag_f_asym  = (wrapTo2Pi(-atan(Imf./omega)-pi) - pi/2).*tperiod/(2*pi);
-    lag_fc_asym  = (wrapTo2Pi(-atan(Imfc./omega)-pi) - pi/2).*tperiod/(2*pi);
+    
     fprintf('Plotting Lag for Q=%4.1e \n',par_array(iQ,1).Q);
 
+    %----------% Parameters %----------%
+    w0 = par.W0*par.Fmax/((par.Fmax/par.Q)^(1/par.n));  % in cm/yr
+
+    
+    lag_q_asym  = (wrapTo2Pi(-atan(Imf./omega)-pi) - pi/2).*tperiod/(2*pi);
+    lag_qc_asym  = (wrapTo2Pi(-atan(Imfc./omega)-pi) - pi/2).*tperiod/(2*pi);
     lag_q  = (wrapTo2Pi(-angle(FFieldsTop.qh(iQ,:))) - pi/2).*tperiod/(2*pi);
     lag_qc = (wrapTo2Pi(-angle(FFieldsTop.qch(iQ,:))) - pi/2).*tperiod/(2*pi);
+        
+    %----------% Plotting lag %----------%
+    plot(SF,tperiod,lag_q,'LineWidth',linew,'color',col_FLUX); hold on;
+    plot(SF,tperiod,lag_qc,'LineWidth',linew,'color',col_ECO2); hold on;
+    plot(SF,tperiod,lag_q_asym,'LineWidth',linew-1,'color',col_FLUX,'LineStyle','--'); hold on;
+    plot(SF,tperiod,lag_qc_asym,'LineWidth',linew-1,'color',col_ECO2,'LineStyle','--'); hold on;
 
     if (iQ==1) 
+        
+        %----------% Axis appearance %----------%
         hold('on');
-        xlabel(SF_Af,'$t_p$ [kyr]','Fontsize',fontsize,'interpreter','latex');
-        ylabel(SF_Af,{'Lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
-        set(SF_Af,'XScale','log','xlim',[1 200],'ylim',[-5 20],'Fontsize',fontsize,'Box','on');
-        grid(SF_Af,'on'); SF_Af.XMinorGrid='on'; SF_Af.YMinorGrid='on';
+        xlabel(SF,'$t_p$ [kyr]','Fontsize',fontsize,'interpreter','latex');
+        ylabel(SF,{'Lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
+        set(SF,'XScale','log','xlim',[1 200],'ylim',[-5 20],'Fontsize',fontsize,'Box','on');
+        grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
+        
+        %----------% Critical period %----------%
+        tp_star = 1/(par.n-1)*par.Hdry/(w0*1e-5)*1e-3;      % in kyr
+        plot(SF,[tp_star,tp_star],get(SF,'ylim'),'LineWidth',linew-1,'color','k','LineStyle','--'); hold on;
+        
     end
-     
-    plot(SF_Af,tperiod(:),lag_q,'LineWidth',linew,'color',col_FLUX); hold on;
-    plot(SF_Af,tperiod(:),lag_qc,'LineWidth',linew,'color',col_ECO2); hold on;
-   plot(SF_Af,tperiod(:),lag_f_asym,'LineWidth',linew,'color',col_FLUX,'LineStyle','--'); hold on;
-    plot(SF_Af,tperiod(:),lag_fc_asym,'LineWidth',linew,'color',col_ECO2,'LineStyle','--'); hold on;
+    
 end
 %----------%%----------% Legend %----------%%----------%
 h(1)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew); hold on;

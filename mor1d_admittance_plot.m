@@ -29,6 +29,7 @@ close all; clear all;
 %----------%%----------% Reading data from  file %----------%%----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%----------% Loading files %----------%
 load('mor1d_admittance.mat');
 
 par_array  = data.par_array;
@@ -60,15 +61,15 @@ tpmin = 0.0;
 step_marker = 8;
 
 %----------%%----------% Initializing %----------%%----------% 
-nfig = nfig + 1; figure(nfig); set(nfig, 'Position', [500, 100, 380, 650]); fig1=nfig;
+nfig = nfig + 1; figure(nfig); set(nfig, 'Position', [500, 100, 650, 350]); fig1=nfig;
 
 p = panel(nfig);
 
 % Create panel 2x3
-p.pack(2,1);
+p.pack(1,2);
 
 p.margin=[22 20 5 8]; %% margin[left bottom right top]
-p.de.margin = 10;
+p.de.margin = 18;
 
 
 %----------%%----------% Plotting Admittance  %----------%%----------%
@@ -98,7 +99,7 @@ end
 
 %----------%%----------% Plotting Lag  %----------%%----------%
 
-p(2,1).select(); SF_Af=gca;
+p(1,2).select(); SF_Af=gca;
 
 for iQ=params_to_plot
 
@@ -124,7 +125,7 @@ end
 %----------%%----------% Legend %----------%%----------%
 h(1)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew); hold on;
 h(2)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew); hold on;
-[hh,icons,plots,txt] = legend(h,{'melt flux','carbon flux'},'Box','off','Fontsize',18,'Position',[0.67 0.85 0.2 0.1],'Units','normalized','Orientation','vertical');  
+[hh,icons,plots,txt] = legend(h,{'melt flux','carbon flux'},'Box','off','Fontsize',18,'Position',[0.28 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');  
 
 fprintf('... DONE \n\n');
 
