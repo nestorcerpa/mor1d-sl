@@ -44,14 +44,14 @@ nperiods = 2; % number of fluctuating-periods to plot in z-t space
 %----------%    Solving problem     %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%----------% Calculate mean state %----------%
-[MFields.cs,MFields.phi] = mean_analytical(zarray,par); %calculate base state analytically
-
-%----------% Get other mean variables %----------%
+%----------% Calculate steady state %----------%
+[MFields.cs,MFields.phi,~] = mean_analytical(zarray,par);
+%----------% Get other steady-state variables %----------%
 [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
     
 %----------% Calculate fluctuations %----------%
-[FFields.csh,FFields.phih] = fluctuations(zarray,par);
+[FFields.csh,FFields.phih,~] = fluctuations(zarray,par);
+%----------% Get other fluctuating variables %----------%
 [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
 
@@ -297,7 +297,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     plot(F01,t,(clp(:,end)-mean(clp(:,end)))./(max(clp(:,end))),'-','linewidth',linew,'color',[1 0 0]);
     set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange,'XTickLabel',[]);
     set(F01,'Ylim',[-1 1],'Ytick',[-1 0 1],'YTickLabel',[]);
-    if (strcmp(par.Burley,'on')==1)
+    if (strcmp(par.Gammap,'off')==1)
         set(F01,'YTickLabel',[]);
     else
         set(F01,'YTickLabel',[],'YAxisLocation','right');
@@ -314,7 +314,7 @@ function plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fontsize,nperi
     plot(F01,t,(fp(:,end)-mean(fp(:,end)))./(max(fp(:,end))),'-','linewidth',linew,'color',[0 0 1]);
     set(F01,'Xlim',[trange(1) trange(end)],'Xtick',trange,'XTickLabel',[]);
     set(F01,'Ylim',[-1 1],'Ytick',[-1 0 1],'YTickLabel',[]);
-    if (strcmp(par.Burley,'on')==1)
+    if (strcmp(par.Gammap,'off')==1)
         set(F01,'YTickLabel',[]);
     else
         set(F01,'YTickLabel',[],'YAxisLocation','right');

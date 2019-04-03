@@ -39,14 +39,10 @@ zarray = linspace(0,1,par.nz);
 
 %----------% Parameters for computation of admittance %----------%
 
-%%%         Wet         Wet         Wet         Dry         Dry Basal
-Q_array  = [par.Q       4*par.Q     par.Q/4     par.Q       par.Q]; 
-Harray   = [par.H       par.H       par.H       par.Hdry    par.Hdry];
-Gammap   = {'on'        'on'        'on'        'on'        'off'}; 
+%%%         Wet          
+Q_array  = [1e4     2e4     4e4     6e4     8e4     1e5     2e5     4e5     6e5     8e5     1e6]; 
 nQs = length(Q_array);
-
-tp_array = [1:1:50     52:2:100     105:5:200]; % Define forcing periods
-ntps = length(tp_array);
+tp_array = [1:1:50     52:2:100     105:5:150 ]; ntps = length(tp_array);
 
 %----------% Loop over models %----------%
 par.verb = "off";
@@ -54,11 +50,9 @@ for iQ = 1:nQs
     
     fprintf('\n ### Calculating admittance for model series : %2d ... \n', iQ);
     par.Q      = Q_array(iQ); 
-    par.Gammap = Gammap{iQ};
-    par.H      = Harray(iQ);
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
 
-    fprintf(' --->  H = %4.1f km; Q = %6.1e ; Gammap : %s \n',par.H,par.Q,par.Gammap)
+    fprintf(' --->  Q = %6.1e \n',par.Q)
     
     for itp = 1:ntps
         
@@ -96,12 +90,7 @@ for iQ = 1:nQs
         data.FFieldsTop.phih(iQ,itp) = FFields.phih(end); 
         data.FFieldsTop.csh(iQ,itp)  = FFields.csh(end);
         data.FFieldsTop.qh(iQ,itp)   = FFields.qh(end);
-        data.FFieldsTop.qch(iQ,itp)  = FFields.qch(end);
-        % Bottom to Surface lag
-        phase_phih  =  unwrap(angle(FFields.phih)); data.lagBCtoSurf.phi(iQ,itp) = -(phase_phih(end)-phase_phih(1))*tp_array(itp)/(2*pi);
-        phase_csh   =  unwrap(angle(FFields.csh) ); data.lagBCtoSurf.cs(iQ,itp)  = -(phase_csh(end)-phase_csh(1))*tp_array(itp)/(2*pi);
-        phase_qh    =  unwrap(angle(FFields.qh)  ); data.lagBCtoSurf.q(iQ,itp)   = -(phase_qh(end)-phase_qh(1))*tp_array(itp)/(2*pi);
-        phase_qch   =  unwrap(angle(FFields.qch) ); data.lagBCtoSurf.qc(iQ,itp)  = -(phase_qch(end)-phase_qch(1))*tp_array(itp)/(2*pi);        
+        data.FFieldsTop.qch(iQ,itp)  = FFields.qch(end);      
         
     end
     
@@ -111,4 +100,4 @@ data.tp_array = tp_array;
 fprintf("\n\n ... DONE\n\n");
 
 %----------% Saving data %----------%
-save('mor1d_admittance.mat','data');
+save('mor1d_admittance_withQ.mat','data');

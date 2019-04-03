@@ -58,10 +58,6 @@ function [xh,yh,csh,phih] = fluctuations_wet(z_out,par)
     %----------% calculate mean state derivatives (needed for boundary conditions)
     z=0;
     [~,~,~,~,dx0,dy0] = mean_analytical_wet(z,par);
- 
-    if (strcmp(par.Burley,'on')==1)
-        dy0=0;
-    end
     
     %----------% calculate fluctuating state
     sol = ode45(@(zi,y) ode(zi,y,par),[0 1],[-dx0;-dy0],options);
@@ -82,12 +78,12 @@ function [xh,yh,csh,phih] = fluctuations_wet(z_out,par)
             [x,y,~,phi,dx,dy] = mean_analytical_wet(z,par);
             dQdphi =  Q*(n*phi^(n-1)*(1-phi)^2 - 2*(1-phi)*phi^n)+1;
             phih=yh/dQdphi;
-             if (strcmp(par.Burley,'off')==1)
+             if (strcmp(par.Gammap,'on')==1)
                 dxh = (D+x+y)^(-1) *( 1i*w*G*x - xh*(1i*w*(D+phi+x)+dy) - yh*dx);
                 dyh = 1i*w*(xh-G-phih) +dxh;
-            elseif (strcmp(par.Burley,'on')==1)
-                dxh = (D+y)^(-1) *(- xh*(1i*w*(D+phi)+dy));
-                dyh = 0;            
+            elseif (strcmp(par.Gammap,'off')==1)
+                dxh = (D+y)^(-1) *(- xh*(1i*w*(D+phi+x)+dy) - yh*dx);
+                dyh = 1i*w*(xh-phih) +dxh;         
             end
             deriv = [dxh;dyh];
         end

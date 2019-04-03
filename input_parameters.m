@@ -42,7 +42,7 @@ function par=input_parameters()
     par.D_vol  = 1e-4;   % Partition coefficient of carbon
     par.Fmax   = 0.2;    % Maximum degree of melting
     par.n      = 2;      % Exponent for permeability-porosity relationship
-    par.Burley ='off';   % Option to run a basal-flux model like Burley and Katz (2015)
+    par.Gammap ='on';   % Option to run a basal-flux model like Burley and Katz (2015)
 
     %----------% Spatial and time parameters %----------%
     par.tp   = 100.e3;  % Period of forging             [yr]

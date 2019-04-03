@@ -51,9 +51,9 @@ tp_min      = 1;            % Minimum sampling period in Fourier Transform
 %----------% Computation of response to SL record %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%----------% Calculate mean state %----------%
-[MFields.cs,MFields.phi] = mean_analytical(z_out,par); % calculate mean state analytically
-%----------% Get other mean variables %----------%
+%----------% Calculate steady state %----------%
+[MFields.cs,MFields.phi,~] = mean_analytical(z_out,par); 
+%----------% Get other steady-state variables %----------%
 [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
 
 nperiod = length(SL.dfs.period); 
@@ -79,7 +79,7 @@ for iperiod = 1:nperiod
     par.omega = 2.*pi/par.tp*par.t0;
 
     %----------% Calculate fluctuating variables %----------%
-    [FFields.csh,FFields.phih] = fluctuations(z_out,par);   % calculate fluctuating fields at z_out;
+    [FFields.csh,FFields.phih,~] = fluctuations(z_out,par);   % calculate fluctuating fields at z_out;
     %----------% Get other fluctuating variables %----------%
     [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
@@ -141,7 +141,7 @@ function [SL] = ReadSLrecord(filename,timew,tp_min);
     % Compute the fourier series and frequency vector
     SL.dfs = dft(SLrecord);
     k      = 1:length(SL.dfs.alpha);           % cycles
-    SL.dfs.period = (time(end) - time(1))./k;  % kiloyears
+    SL.dfs.period = (time(end) - time(1))./k;  % 
 
     % Reconstruct SL discarding highest frequencies
     I            = find(SL.dfs.period >= tp_min);

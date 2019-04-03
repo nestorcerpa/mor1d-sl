@@ -56,5 +56,5 @@ function [Wh,qh,qch] = get_other_ffields(phim,csm,phih,csh,par)
     %----------% Fluctuating chemical flux %----------% 
     qb = 1 - (1-phim).*Wm;
     qch = (csm.*qh + qb.*csh)/par.D_vol;
-    
+
 end

@@ -25,9 +25,9 @@
 
 close all; clear all;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%----------% Reading data from  file %----------%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----------%%----------% Reading data from  file %----------%%----------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 load('mor1d_admittance.mat');
 
@@ -119,9 +119,15 @@ for iQ=params_to_plot
     plot(SF_Af,tperiod(:),lag_qc,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
 
 end
+
+
 %----------%%----------% Legend %----------%%----------%
 h(1)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew); hold on;
 h(2)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew); hold on;
 [hh,icons,plots,txt] = legend(h,{'melt flux','carbon flux'},'Box','off','Fontsize',18,'Position',[0.67 0.85 0.2 0.1],'Units','normalized','Orientation','vertical');  
 
-fprintf('... DONE \n\n')
+fprintf('... DONE \n\n');
+
+
+
+

@@ -46,8 +46,8 @@ fcrange       = [-3  0]; % carbon flux
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------%  Defining model parameters array %----------%
-Harray   = [par.H  par.Hdry   par.Hdry];
-Burley   = {'off'  'off'    'on'};
+Harray   = [par.H  par.Hdry  par.Hdry];
+Gammap   = {'on'   'on'      'off'};
 tparray  = [23 41 100]; % tp-array wjTh tp in kyr
 
 %----------%  Loop over model parameters  %----------%
@@ -56,12 +56,14 @@ for iH = 1:length(Harray)
     
     %----------% Updating parameters %----------%
     par.H = Harray(iH);                     % H value
-    par.Burley = Burley{iH};                % Turning on/off effects of sea-level induced pressure variations
+    par.Gammap = Gammap{iH};                % Turning on/off effects of sea-level induced pressure variations
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
         
     %----------% Calculate mean variables %----------%
-    [~,~,MFields.cs,MFields.phi,~,~] = mean_analytical(zarray,par); %calculate base state analytically
-    
+    [MFields.cs,MFields.phi,~] = mean_analytical(zarray,par); %calculate base state analytically
+    %----------% Get other mean variables %----------%
+    [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
+        
     for jT = 1:length(tparray);
         
         fprintf('\n Model %3d.%1d : H = %4.1f km, Tp = %4.1f kyr',iH,jT,Harray(iH),tparray(jT))
@@ -69,13 +71,10 @@ for iH = 1:length(Harray)
         par.tp    = tparray(jT)*1e3; 
         par=get_dimensionless_parameters(par);  % Updating dimensionless parameters (for omega)
         
-        %----------% Get other mean variables %----------%
-        [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
-
         %----------% Calculate fluctuating variables %----------%
-        [~,~,FFields.csh,FFields.phiH] = fluctuations(zarray,par);
+        [FFields.csh,FFields.phih,~] = fluctuations(zarray,par);
         %----------% Get other fluctuating variables %----------%
-        [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phiH,FFields.csh,par); 
+        [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
         array_MFields{iH,jT} = MFields; 
         array_FFields{iH,jT} = FFields;
@@ -496,7 +495,6 @@ function plot_basal_carbonflux(nfig,array_MFields,array_FFields,array_par,fontsi
         p(1,jT).select(); F_row1=gca;
 
             plot(F_row1,t*t_rescale,cos(par.omega*t),'--','linewidth',linew,'color',slcolor); hold on;
-            plot(F_row1,t*t_rescale,sin(par.omega*t),':','linewidth',linew,'color',slcolor); hold on; 
             set(F_row1,'Ylim',[-1 1],'Ytick',[-1 1]);
             set(F_row1,'YTickLabel',{'$-1$' '$+1$'});
             title(F_row1,sprintf('$t_p$=%3d kyr',par.tp*1e-3)); 
