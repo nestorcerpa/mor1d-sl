@@ -77,8 +77,8 @@ function par=input_parameters()
     par=get_dimensionless_parameters(par);
     
     %----------% Spatial and time arrays %----------%
-    par.nz = 2000;
-    par.ntime = 1000;
+    par.nz = 400;
+    par.ntime = 400;
     
     
     %----------%%----------%%----------%%----------%%----------%
