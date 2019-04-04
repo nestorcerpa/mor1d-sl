@@ -36,7 +36,7 @@ function [xh,yh,csh,phih] = fluctuations_wet(z_out,par)
 %         par.Q    : $\mathcal{Q}$
 %   Outputs
 %       xh   : $\hat{x}$=M/c;
-%       yh   : $\hat{y}$
+%       yh   : fluctuating liquid flux $\hat{y}=\hat{Q}$
 %       csh  : fluctuating carbon concentration in solid \hat{c_s}
 %       phih : fluctuating porosity \hat{\phi} 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
