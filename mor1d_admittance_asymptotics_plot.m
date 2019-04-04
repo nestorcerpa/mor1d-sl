@@ -91,17 +91,20 @@ for iQ=params_to_plot
     w0 = par.W0*par.Fmax/((par.Fmax/par.Q)^(1/par.n));  % in cm/yr
 
     %----------% Admittance analytic %----------%
-    % Admittance approximation
+    % Admittance approximation at low tp
     Afactor = (D+phibar)/(D+phibar+cbar);
     Af0 = par.delta0*par.G/Qbar * (Afactor) * dQ_dphi;                          % Eq. (C.5)        
     Afc0 = par.delta0*par.G*(Afactor*dQ_dphi./Qbar - 1./(D+phibar+cbar) );      % Eq. (C.7)
-    % Admittance approximation for D<<\phi<<1
+    % Admittance approximation at low tp for D<<\phi<<1
     Af_smallD  = n*par.delta0*par.Fmax^(1-1/n)*par.H/par.Hdry*par.Q^(1/n);      % Eq. (C.6)
     Afc_smallD = (n-1)*par.delta0*par.Fmax^(1-1/n)*par.H/par.Hdry*par.Q^(1/n);  % Eq. (C.8)
-    % Phase approximation
+    % Phase approximation at low tp
     Imf  = (n-1)*par.G*(par.Q/par.Fmax)^(1/n);
     Imfc = ((n^2-2*n+1/n)/(n-1))*par.G*(par.Q/par.Fmax)^(1/n);
     omega= (2*pi*par.t0)./(tperiod*1e3);
+    % Admittance approximation at high tp
+    DeltaS = 100*1e2; % SL in cm;
+    RelAdm_ECO2_th = (par.rhow*DeltaS)/(par.rhom*par.W0).*(2*pi./(tperiod*1e3));    
 
     % Admittance from models
     RelAdm_FLUX = par_array(iQ,1).delta0*abs(FFieldsTop.qh(iQ,:))./MFieldsTop.q(iQ);  
@@ -115,10 +118,12 @@ for iQ=params_to_plot
     % Melt flux
     plot(SF,tperiod,2*RelAdm_FLUX(:)*100,'LineWidth',linew,'color',col_FLUX); hold on;
     plot(SF,tperiod,2*Af0*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_FLUX,'LineStyle',':'); hold on;          % (C.5) 
-    plot(SF,tperiod,2*Afc0*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_ECO2,'LineStyle',':'); hold on;         % (C.7)
+    plot(SF,tperiod,2*Af_smallD*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_FLUX,'LineStyle','--'); hold on;   % (C.6)
+    plot(SF,tperiod,RelAdm_ECO2_th*100,'LineWidth',linew-1,'color',col_FLUX,'LineStyle','-.'); hold on;
+    
     % Carbon flux
     plot(SF,tperiod,2*RelAdm_ECO2(:)*100,'LineWidth',linew,'color',col_ECO2); hold on;
-    plot(SF,tperiod,2*Af_smallD*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_FLUX,'LineStyle','--'); hold on;   % (C.6)
+    plot(SF,tperiod,2*Afc0*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_ECO2,'LineStyle',':'); hold on;         % (C.7)
     plot(SF,tperiod,2*Afc_smallD*100+zeros(size(tperiod)),'LineWidth',linew-1,'color',col_ECO2,'LineStyle','--'); hold on;  % (C.8)
     
     if (iQ==1) 
@@ -127,7 +132,7 @@ for iQ=params_to_plot
         hold('on');
         xlabel(SF,'$t_p$ [kyr]','Fontsize',fontsize,'interpreter','latex');
         ylabel(SF,{'$A$ [\% per 100-m of SL change]'},'Fontsize',fontsize,'interpreter','latex');
-        set(SF,'XScale','log','YScale','log','xlim',[1 200],'ylim',[1 30],'Fontsize',fontsize,'Box','on');
+        set(SF,'XScale','log','YScale','log','xlim',[1 500],'ylim',[1 30],'Fontsize',fontsize,'Box','on');
         grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
         
         %----------% Critical period %----------%
@@ -168,7 +173,7 @@ for iQ=params_to_plot
         hold('on');
         xlabel(SF,'$t_p$ [kyr]','Fontsize',fontsize,'interpreter','latex');
         ylabel(SF,{'Lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
-        set(SF,'XScale','log','xlim',[1 200],'ylim',[-5 20],'Fontsize',fontsize,'Box','on');
+        set(SF,'XScale','log','xlim',[1 500],'ylim',[-5 20],'Fontsize',fontsize,'Box','on');
         grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
         
         %----------% Critical period %----------%
