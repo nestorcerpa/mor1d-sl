@@ -26,7 +26,7 @@
 function [cs,y,phi,dcs,dy] = mean_analytical_dry(z,par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MEAN_ANALYTICAL_DRY : Calculatesmean variables and derivatives
+% MEAN_ANALYTICAL_DRY : Calculates steady-state variables (Eqs. A.1a,b) and derivatives
 %   Inputs
 %       z   : depth (can be a scalar or vector)
 %       par : array with model parameters

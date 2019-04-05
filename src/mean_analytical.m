@@ -24,6 +24,16 @@
 % % % SOFTWARE.
 
 function [cs,phi,y] = mean_analytical(z,par);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MEAN_ANALYTICAL : Call solvers for equations A.1a and A.1b from the EPSL paper
+%   Inputs
+%       z   : depth (can be a scalar or vector)
+%       par : array with model parameters
+%    Outputs
+%       cs  : steady-state solid concentration
+%       phi : steady-state porosity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
    if (par.M<=1e-6)
       [cs,y,phi,~,~] = mean_analytical_dry(z,par);
    else

@@ -24,6 +24,15 @@
 % % % SOFTWARE.
 
 function [csh,phih,yh] = fluctuations(z,par)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FLUCTUATIONS : Call solvers for equations B.1a and B.1b from the EPSL paper
+%   Inputs
+%       z   : depth (can be a scalar or vector)
+%       par : array with model parameters
+%    Outputs
+%       csh  : fluctuating carbon concentration in solid \hat{c_s}
+%       phih : fluctuating porosity \hat{\phi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    if (par.M<=1e-6)
       [csh,yh,phih] = fluctuations_dry(z,par);

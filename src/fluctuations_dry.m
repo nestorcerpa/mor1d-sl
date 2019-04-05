@@ -26,7 +26,7 @@
 function [csh,yh,phih] = fluctuations_dry(z_out,par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FLUCTUATIONS Calculates flucuating variables 
+% FLUCTUATIONS Calculates fluctuating variables (Eqs. B.1a,b)
 %   Inputs
 %       z_out is set of depths at which outputs are evaluated (can be a scalar or vector)
 %       par : array with model parameters

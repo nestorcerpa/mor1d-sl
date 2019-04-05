@@ -26,7 +26,7 @@
 function [x,y,cs,phi,dx,dy] = mean_analytical_wet(z,par)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MEAN_ANALYTICAL_WET : Calculatesmean variables and derivatives
+% MEAN_ANALYTICAL_WET : Calculates steady-state variables (Eqs. A.1a,b) and derivatives
 %   Inputs 
 %       z   : depth (can be a scalar or vector)
 %       par : array with model parameters

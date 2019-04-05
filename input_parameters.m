@@ -69,6 +69,13 @@ function par=input_parameters()
     %----------% Miscellaneous options %----------%
     par.verb='on';               % Verbosity
          
+    %----------%%----------%%----------%%----------%%----------%
+    %----------%  ##  Modifying matlab options  ##  %----------%
+    %----------%%----------%%----------%%----------%%----------%    
+    
+    %----------% Add paths to functions %----------%
+    restoredefaultpath; addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
+
     %----------%%----------%%----------%%----------%
     %----------% ## OTHER MODEL PARAMETERS ## %----------%
     %----------%%----------%%----------%%----------%
@@ -81,13 +88,7 @@ function par=input_parameters()
     par.ntime = 1000;
     
     
-    %----------%%----------%%----------%%----------%%----------%
-    %----------%  ##  Modifying matlab options  ##  %----------%
-    %----------%%----------%%----------%%----------%%----------%    
     
-    %----------% Add paths to functions %----------%
-    restoredefaultpath; addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
-
     %----------% Latex font %----------%
     if (strcmp(get(groot,'defaulttextinterpreter'),'latex')~=1); set(groot,'defaulttextinterpreter','latex'); end;
     if (strcmp(get(groot,'defaultAxesTickLabelInterpreter'),'latex')~=1); set(groot,'defaultAxesTickLabelInterpreter','latex'); end;
