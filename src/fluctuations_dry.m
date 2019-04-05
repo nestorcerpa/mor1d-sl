@@ -36,7 +36,7 @@ function [csh,yh,phih] = fluctuations_dry(z_out,par)
 %         par.Q    : $\mathcal{Q}$
 %   Outputs
 %       csh  : fluctuating carbon concentration in solid \hat{c_s}
-%       yh   : $\hat{y}$
+%       yh   : fluctuating liquid flux $\hat{y}=\hat{Q}$
 %       phih : fluctuating porosity \hat{\phi} 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

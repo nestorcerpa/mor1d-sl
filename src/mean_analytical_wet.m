@@ -36,7 +36,7 @@ function [x,y,cs,phi,dx,dy] = mean_analytical_wet(z,par)
 %         par.Q    : $\mathcal{Q}$
 %    Outputs 
 %       x   : change of variable x = Mc
-%       y   : change of variable y = phi + q(phi) 
+%       y   : change of variable y = Q(phi) 
 %       cs  : mean solid concentration
 %       phi : mean porosity
 %       dx  : spatial-derivative of x

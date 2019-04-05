@@ -36,7 +36,7 @@ function [cs,y,phi,dcs,dy] = mean_analytical_dry(z,par)
 %         par.Q    : $\mathcal{Q}$
 %    Outputs
 %       cs  : mean solid concentration
-%       y   : change of variable y = phi + q(phi)
+%       y   : change of variable y = Q(phi)
 %       phi : mean porosity
 %       dcs  : spatial-derivative of cs
 %       dy  : spatial-derivative of y
