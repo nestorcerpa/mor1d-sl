@@ -31,6 +31,9 @@ close all; clear all;
 
 par = input_parameters(); % Initializing model parameters
 
+%par.H = par.Hdry; 
+%par   = get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+
 %----------% Spatial and time arrays %----------%
 zarray = linspace(0,1,par.nz);
 
@@ -55,6 +58,77 @@ nperiods = 2; % number of fluctuating-periods to plot in z-t space
 [FFields.Wh,FFields.qh,FFields.qch] = get_other_ffields(MFields.phi,MFields.cs,FFields.phih,FFields.csh,par); 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----------%  2-d Approximation for MOR focusing  %----------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+drho = 500;           % solid-liquid density contrast 
+rhol = par.rhom-drho; % liquid density
+rhoc = 2900.;         % crust density
+
+par.alpha = 30.;      % angle of decompaction channel
+par.xf    = 33.5;     % focusing distance xf
+hf    = par.xf*tan(par.alpha*pi/180.); % depth decompating channel at x=xf
+
+nz = 30;
+zf_array  = linspace(par.H-hf,par.H,nz)/par.H;
+tan_alpha = tan(par.alpha*pi/180.);
+
+%----------% Calculate steady state %----------%
+MFields.Rmor = 0.0; MFields.Rcmor = 0.0; MFields.Hcru = 0.0; tau_array(1) = nan;
+for i=2:length(zf_array)
+    dz  = zf_array(i)-zf_array(i-1);
+    [cs_i,phi_i,~] = mean_analytical(zf_array(i),par);  % Calculate base state analytically 
+    [W_i,q_i,qc_i] = get_other_mfields(phi_i,cs_i,par); % Get other variables    
+    MFields.Rmor  = MFields.Rmor  + 2*q_i*dz/tan_alpha; % Factor 2 is for taking into account both sides of ridge's axis
+    MFields.Rcmor = MFields.Rcmor + 2*qc_i*dz/tan_alpha;
+    MFields.Hcru  = MFields.Hcru  + 2*q_i/(pi/2)*rhol/rhoc*dz/tan_alpha;
+    tau_array(i)  = 0.0; % tranport-time for melt originated at z = zf_array(i)
+    for j = i:length(zf_array)
+        dzj  = zf_array(j)-zf_array(j-1);
+        [cs_j,phi_j,~] = mean_analytical(zf_array(j),par);  % Calculate base state analytically 
+        [W_j,f_j,fc_j] = get_other_mfields(phi_j,cs_j,par); % Get other variables   
+        w_j = par.Q*phi_j^(par.n-1)*(1-phi_j)^2;            % steady-state melt velocity
+        tau_array(i) = tau_array(i) + 1./w_j*dzj;
+    end
+end
+fprintf("\n ---> Mean crustal thickness = %5.2f km \n",MFields.Hcru*par.H);
+
+
+%----------% Calculate fluctuations %----------%
+par.verb = 'off';
+fprintf('\n Calculating approx 2-d model (complex) ...\n');
+FFields.Rmorh0 = 0.0; FFields.Rcmorh0 = 0.0;
+FFields.Rmorh1 = 0.0; FFields.Rcmorh1 = 0.0;
+for i=2:length(zf_array)
+    dz  = zf_array(i)-zf_array(i-1);
+    [cs_i,phi_i,~] = mean_analytical(zf_array(i),par); % Calculate base state analytically 
+    [ch_i,phih_i] = fluctuations(zf_array(i),par);
+    [Wh_i,qh_i,qch_i] = get_other_ffields(phi_i,cs_i,phih_i,ch_i,par); 
+    % Instantaneous focusing     
+    FFields.Rmorh0  = FFields.Rmorh0  + 2.0*qh_i*dz/tan_alpha;
+    FFields.Rcmorh0 = FFields.Rcmorh0 + 2.0*qch_i*dz/tan_alpha;
+    % Focusing time equal to steady-state melt transport time
+    %w_i = par.Q*phi_i^(par.n-1)*(1-phi_i)^2;           % steady-state melt velocity
+    tau =  tau_array(i); %(1-zf_array(i))/tan_alpha/w_i;
+    FFields.Rmorh1   = FFields.Rmorh1  + 2.0*exp(-1i*par.omega*tau)*qh_i*dz/tan_alpha;
+    FFields.Rcmorh1  = FFields.Rcmorh1 + 2.0*exp(-1i*par.omega*tau)*qch_i*dz/tan_alpha;
+end
+fprintf('\n... Done \n');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----------%   Admittance calculation   %----------%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+AQ  = 2.*par.delta0*abs(FFields.qh(end))/MFields.q(end); 
+AR0 = 2.*par.delta0*abs(FFields.Rmorh0)/MFields.Rmor; 
+AR1 = 2.*par.delta0*abs(FFields.Rmorh1)/MFields.Rmor;
+
+fprintf('\n \t ..Admittance flux per 100-m of SL change in 1-d model           : %5.2f %%',AQ*100.)
+fprintf('\n \t ..Admittance flux per 100-m of SL change in 2-d approx. (tau=0) : %5.2f %%',AR0*100.)
+fprintf('\n \t ..Admittance flux per 100-m of SL change in 2-d approx. (tau>0) : %5.2f %% \n',AR1*100.)
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------%    Plotting solution   %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +144,6 @@ plot_fluctuationsh(nfig,FFields,zarray,par,linew,fonts);
 
 nfig=nfig+1; figure(nfig);
 plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fonts,nperiods); 
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%         LOCAL FUNCTIONS         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

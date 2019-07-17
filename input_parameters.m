@@ -23,10 +23,12 @@
 % % % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % % % SOFTWARE.
 
-function par=input_parameters() 
+function par=input_parameters(varargin);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INPUT_PARAMETERS 
+%   Input 
+%       varargin{1} : = 0 to not restart the default path 
 %   Output
 %       par : array with model parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,7 +47,7 @@ function par=input_parameters()
     par.Gammap ='on';   % Option to run a basal-flux model like Burley and Katz (2015)
 
     %----------% Spatial and time parameters %----------%
-    par.tp   = 100.e3;  % Period of forging             [yr]
+    par.tp   = 10.e3;  % Period of forging             [yr]
     par.Hdry = 65.;     % Height of dry-melting column  [km]
     par.H    = 130.;    % Height of melting column      [km]
 
@@ -74,7 +76,10 @@ function par=input_parameters()
     %----------%%----------%%----------%%----------%%----------%    
     
     %----------% Add paths to functions %----------%
-    restoredefaultpath; addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
+    if (nargin==0 || varargin{1}~=false);
+        fprintf('...restoring default matlab path...')
+        restoredefaultpath; addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
+    end;
 
     %----------%%----------%%----------%%----------%
     %----------% ## OTHER MODEL PARAMETERS ## %----------%
@@ -85,7 +90,7 @@ function par=input_parameters()
     
     %----------% Spatial and time arrays %----------%
     par.nz = 400;
-    par.ntime = 400;
+    par.ntime = 100;
     
     
     
