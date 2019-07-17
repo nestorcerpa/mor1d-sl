@@ -99,7 +99,7 @@ for iQ = 1:nQs
     
     for itp = 1:ntps
         
-        fprintf('%3d/%3d  ',itp,ntps);
+        fprintf(' %3d/%3d  ',itp,ntps);
         
         %----------% Update forcing period %----------%
         par.tp    = tp_array(itp)*1e3; % [yr]
@@ -125,10 +125,10 @@ for iQ = 1:nQs
             w_i = par.Q*phi_i^(par.n-1)*(1-phi_i)^2;              % steady-state melt velocity
             [~,qh_i,qch_i]    = get_other_ffields(phi_i,cs_i,phih_i,ch_i,par); 
             tau = tau_array(i); 
-            FFields.Rmorh0  = FFields.Rmorh  + 2.0*qh_i*dz/tan_alpha;
-            FFields.Rcmorh0 = FFields.Rcmorh + 2.0*qch_i*dz/tan_alpha;
-            FFields.Rmorh   = FFields.Rmorh  + 2.0*exp(-1i*par.omega*tau)*qh_i*dz/tan_alpha;
-            FFields.Rcmorh  = FFields.Rcmorh + 2.0*exp(-1i*par.omega*tau)*qch_i*dz/tan_alpha;
+            FFields.Rmorh0  = FFields.Rmorh0  + 2.0*qh_i*dz/tan_alpha;
+            FFields.Rcmorh0 = FFields.Rcmorh0 + 2.0*qch_i*dz/tan_alpha;
+            FFields.Rmorh   = FFields.Rmorh   + 2.0*exp(-1i*par.omega*tau)*qh_i*dz/tan_alpha;
+            FFields.Rcmorh  = FFields.Rcmorh  + 2.0*exp(-1i*par.omega*tau)*qch_i*dz/tan_alpha;
         end
         fprintf('.');
         
