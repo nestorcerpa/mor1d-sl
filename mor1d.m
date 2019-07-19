@@ -31,8 +31,20 @@ close all; clear all;
 
 par = input_parameters(); % Initializing model parameters
 
-%par.H = par.Hdry; 
-%par   = get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+par.Gammap = 'off';
+par.H = par.Hdry; 
+
+%%% Burley and Katz 2015 parameters 
+% cmyr_to_ms = 0.316881e-9;
+% U0_BK15 = 3.0; k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01;
+% W0_BK15 = U0_BK15*2.0/pi; % in m/s
+% w0_BK15 = drho_BK15*10.0*k0_BK15/phi0_BK15/cmyr_to_ms;
+% Q_BK15 = (w0_BK15/W0_BK15)^n_BK15 * par.Fmax^(1-n_BK15);
+% par.Q = Q_BK15;
+% par.n = n_BK15;
+
+par   = get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+
 
 %----------% Spatial and time arrays %----------%
 zarray = linspace(0,1,par.nz);
@@ -67,7 +79,7 @@ rhol = par.rhom-drho; % liquid density
 rhoc = 2900.;         % crust density
 
 par.alpha = 30.;      % angle of decompaction channel
-par.xf    = 33.5;     % focusing distance xf
+par.xf    = 33.2;     % focusing distance xf
 hf    = par.xf*tan(par.alpha*pi/180.); % depth decompating channel at x=xf
 
 nz = 30;
@@ -109,8 +121,7 @@ for i=2:length(zf_array)
     FFields.Rmorh0  = FFields.Rmorh0  + 2.0*qh_i*dz/tan_alpha;
     FFields.Rcmorh0 = FFields.Rcmorh0 + 2.0*qch_i*dz/tan_alpha;
     % Focusing time equal to steady-state melt transport time
-    %w_i = par.Q*phi_i^(par.n-1)*(1-phi_i)^2;           % steady-state melt velocity
-    tau =  tau_array(i); %(1-zf_array(i))/tan_alpha/w_i;
+    tau =  tau_array(i); 
     FFields.Rmorh1   = FFields.Rmorh1  + 2.0*exp(-1i*par.omega*tau)*qh_i*dz/tan_alpha;
     FFields.Rcmorh1  = FFields.Rcmorh1 + 2.0*exp(-1i*par.omega*tau)*qch_i*dz/tan_alpha;
 end
@@ -126,7 +137,15 @@ AR1 = 2.*par.delta0*abs(FFields.Rmorh1)/MFields.Rmor;
 
 fprintf('\n \t ..Admittance flux per 100-m of SL change in 1-d model           : %5.2f %%',AQ*100.)
 fprintf('\n \t ..Admittance flux per 100-m of SL change in 2-d approx. (tau=0) : %5.2f %%',AR0*100.)
-fprintf('\n \t ..Admittance flux per 100-m of SL change in 2-d approx. (tau>0) : %5.2f %% \n',AR1*100.)
+fprintf('\n \t ..Admittance flux per 100-m of SL change in 2-d approx. (tau>0) : %5.2f %% \n\n',AR1*100.)
+
+AQC  = 2.*par.delta0*abs(FFields.qch(end))/MFields.qc(end); 
+ARC0 = 2.*par.delta0*abs(FFields.Rcmorh0)/MFields.Rcmor; 
+ARC1 = 2.*par.delta0*abs(FFields.Rcmorh1)/MFields.Rcmor;
+
+fprintf('\n \t ..Admittance carbon flux per 100-m of SL change in 1-d model           : %5.2f %%',AQC*100.)
+fprintf('\n \t ..Admittance carbon flux per 100-m of SL change in 2-d approx. (tau=0) : %5.2f %%',ARC0*100.)
+fprintf('\n \t ..Admittance carbon flux per 100-m of SL change in 2-d approx. (tau>0) : %5.2f %% \n\n',ARC1*100.)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,6 +163,8 @@ plot_fluctuationsh(nfig,FFields,zarray,par,linew,fonts);
 
 nfig=nfig+1; figure(nfig);
 plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fonts,nperiods); 
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%         LOCAL FUNCTIONS         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
