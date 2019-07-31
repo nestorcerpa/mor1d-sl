@@ -33,17 +33,6 @@ par = input_parameters();
 
 zarray = linspace(0,1,par.nz);
 
-%%%%---- Parameters for 2-d model approximation 
-
-drho = 500;           % solid-liquid density contrast 
-rhol = par.rhom-drho; % liquid density
-rhoc = 2900.;         % crust density
-par.alpha = 30.;      % angle of decompaction channel
-par.xf    = 33.2;     % focusing distance xf
-hf    = par.xf*tan(par.alpha*pi/180.); % depth decompating channel at x=xf
-nz    = 30;
-zf_array  = linspace(par.H-hf,par.H,nz)/par.H;
-tan_alpha = tan(par.alpha*pi/180.);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------%    Compute admittances    %----------%
@@ -57,7 +46,7 @@ Harray   = [par.H       par.H       par.H       par.Hdry    par.Hdry];
 Gammap   = {'on'        'on'        'on'        'on'        'off'}; 
 nQs = length(Q_array);
 
-tp_array = [1:1:50     52:2:100     105:5:200   300:50:500]; % Define forcing periods
+tp_array = [5:1:50     52:2:100     105:5:200 ]; % Define forcing periods
 ntps = length(tp_array);
 
 %----------% Loop over models %----------%
@@ -69,6 +58,7 @@ for iQ = 1:nQs
     par.Gammap = Gammap{iQ};
     par.H      = Harray(iQ);
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+    zarray = linspace(0,1,par.nz); 
 
     fprintf(' --->  H = %4.1f km; Q = %6.1e ; Gammap : %s ; t0 = %6.1e \n ',par.H,par.Q,par.Gammap,par.t0);
     
@@ -78,21 +68,19 @@ for iQ = 1:nQs
     [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
 
     %----------% Calculate 2-d approx %----------%
-    MFields.Rmor = 0.0; MFields.Rcmor = 0.0; MFields.Hcru = 0.0; 
-    zf_array = linspace(par.H-hf,par.H,nz)/par.H;
-    for i=2:length(zf_array)
-        dz  = zf_array(i)-zf_array(i-1);
-        [cs_i,phi_i,~] = mean_analytical(zf_array(i),par); %calculate base state analytically 
-        [W_i,q_i,qc_i] = get_other_mfields(phi_i,cs_i,par);  % Get other variables    
-        MFields.Rmor  = MFields.Rmor  + 2.0*q_i*dz/tan_alpha;
-        MFields.Rcmor = MFields.Rcmor + 2.0*qc_i*dz/tan_alpha;
-        MFields.Hcru  = MFields.Hcru  + 2.0*q_i/(pi/2)*rhol/rhoc*dz/tan_alpha;
-        tau_array(i)  = 0.0; % tranport-time for melt originated at z = zf_array(i)
-        for j = i:length(zf_array)
-            dzj  = zf_array(j)-zf_array(j-1);
-            [cs_j,phi_j,~] = mean_analytical(zf_array(j),par);  % Calculate base state analytically 
+    [~,idx_zf] = min(abs(zarray-(1-par.hf/par.H)));
+    tan_alpha = tan(par.alpha*pi/180.);
+    MFields.Rmor = 0.0; MFields.Rcmor = 0.0; MFields.Hcru = 0.0; MFields.tau_array(1:idx_zf) = nan;    for i=idx_zf+1:length(zarray)
+        dz  = zarray(i)-zarray(i-1);   
+        MFields.Rmor  = MFields.Rmor  + 2.0*MFields.q(i)*dz/tan_alpha;
+        MFields.Rcmor = MFields.Rcmor + 2.0*MFields.qc(i)*dz/tan_alpha;
+        MFields.Hcru  = MFields.Hcru  + 2.0*MFields.q(i)/(pi/2)*par.rhol/par.rhoc*dz/tan_alpha;
+        MFields.tau_array(i) = 0.0;
+        for j = i:length(zarray)
+            dzj  = zarray(j)-zarray(j-1);
+            [cs_j,phi_j,~] = mean_analytical(zarray(j),par);  % Calculate base state analytically 
             w_j = par.Q*phi_j^(par.n-1)*(1-phi_j)^2;            % steady-state melt velocity
-            tau_array(i) = tau_array(i) + 1./w_j*dzj;
+            MFields.tau_array(i) = MFields.tau_array(i) + 1./w_j*dzj;
         end
     end
     
@@ -118,16 +106,13 @@ for iQ = 1:nQs
         fprintf('.');
         FFields.Rmorh0= 0.0; FFields.Rcmorh0= 0.0;
         FFields.Rmorh = 0.0; FFields.Rcmorh = 0.0; 
-        for i=2:length(zf_array)
-            dz = zf_array(i)-zf_array(i-1); 
-            [cs_i,phi_i,~]    = mean_analytical(zf_array(i),par); % calculate steady state analytically 
-            [ch_i,phih_i]     = fluctuations(zf_array(i),par);
-            [~,qh_i,qch_i]    = get_other_ffields(phi_i,cs_i,phih_i,ch_i,par); 
-            tau = tau_array(i); 
+        for i=idx_zf+1:length(zarray)
+            dz  = zarray(i)-zarray(i-1);
+            qh_i = FFields.qh(i); qch_i = FFields.qch(i);
             FFields.Rmorh0  = FFields.Rmorh0  + 2.0*qh_i*dz/tan_alpha;
             FFields.Rcmorh0 = FFields.Rcmorh0 + 2.0*qch_i*dz/tan_alpha;
-            FFields.Rmorh   = FFields.Rmorh   + 2.0*exp(-1i*par.omega*tau)*qh_i*dz/tan_alpha;
-            FFields.Rcmorh  = FFields.Rcmorh  + 2.0*exp(-1i*par.omega*tau)*qch_i*dz/tan_alpha;
+            FFields.Rmorh   = FFields.Rmorh   + 2.0*exp(-1i*par.omega*MFields.tau_array(i))*qh_i*dz/tan_alpha;
+            FFields.Rcmorh  = FFields.Rcmorh  + 2.0*exp(-1i*par.omega*MFields.tau_array(i))*qch_i*dz/tan_alpha;
         end
         fprintf('.');
         
@@ -184,13 +169,13 @@ par = input_parameters(0);
 
 %%% Burley and Katz 2015 parameters 
 cmyr_to_ms = 0.316881e-9;
-U0_BK15 = 3.0; k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01;
-W0_BK15 = U0_BK15*2.0/pi; % in m/s
-w0_BK15 = drho_BK15*10.0*k0_BK15/phi0_BK15/cmyr_to_ms;
-Q_BK15 = (w0_BK15/W0_BK15)^n_BK15 * par.Fmax^(1-n_BK15);
+W0_BK15    = 3.0*2/pi*cmyr_to_ms;   % in [m/s] with U0= 3 cm/yr 
+k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01;
+k_BK15 = k0_BK15/(phi0_BK15^(n_BK15));
+Q_BK15 = drho_BK15*10.0*k_BK15/(W0_BK15);
+w0_on_W0_BK15 = par.Fmax^((n_BK15-1)/n_BK15) * Q_BK15^(1./n_BK15); w0_BK15=w0_on_W0_BK15*W0_BK15;
 
-
-par.W0 = W0_BK15;
+par.W0 = W0_BK15/cmyr_to_ms;
 par.n  = n_BK15; 
 par.Q  = Q_BK15;
 par.H  = par.Hdry;
@@ -206,6 +191,7 @@ for iQ = 1:nQs
     par.Gammap = Gammap{iQ};
     
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+    zarray = linspace(0,1,par.nz); 
 
     fprintf(' --->  Gammap : %s \n ',par.Gammap);
     
@@ -216,21 +202,19 @@ for iQ = 1:nQs
     [MFields.W,MFields.q,MFields.qc] = get_other_mfields(MFields.phi,MFields.cs,par);
 
     %----------% Calculate 2-d approx %----------%
-    MFields.Rmor = 0.0; MFields.Rcmor = 0.0; MFields.Hcru = 0.0; 
-    zf_array = linspace(par.H-hf,par.H,nz)/par.H;
-    for i=2:length(zf_array)
-        dz  = zf_array(i)-zf_array(i-1);
-        [cs_i,phi_i,~] = mean_analytical(zf_array(i),par); %calculate base state analytically 
-        [W_i,q_i,qc_i] = get_other_mfields(phi_i,cs_i,par);  % Get other variables    
-        MFields.Rmor  = MFields.Rmor  + 2.0*q_i*dz/tan_alpha;
-        MFields.Rcmor = MFields.Rcmor + 2.0*qc_i*dz/tan_alpha;
-        MFields.Hcru  = MFields.Hcru  + 2.0*q_i/(pi/2)*rhol/rhoc*dz/tan_alpha;
-        tau_array(i)  = 0.0; % tranport-time for melt originated at z = zf_array(i)
-        for j = i:length(zf_array)
-            dzj  = zf_array(j)-zf_array(j-1);
-            [cs_j,phi_j,~] = mean_analytical(zf_array(j),par);  % Calculate base state analytically 
+    [~,idx_zf] = min(abs(zarray-(1-par.hf/par.H)));
+    tan_alpha = tan(par.alpha*pi/180.);
+    MFields.Rmor = 0.0; MFields.Rcmor = 0.0; MFields.Hcru = 0.0; MFields.tau_array(1:idx_zf) = nan;    for i=idx_zf+1:length(zarray)
+        dz  = zarray(i)-zarray(i-1);   
+        MFields.Rmor  = MFields.Rmor  + 2.0*MFields.q(i)*dz/tan_alpha;
+        MFields.Rcmor = MFields.Rcmor + 2.0*MFields.qc(i)*dz/tan_alpha;
+        MFields.Hcru  = MFields.Hcru  + 2.0*MFields.q(i)/(pi/2)*par.rhol/par.rhoc*dz/tan_alpha;
+        MFields.tau_array(i) = 0.0;
+        for j = i:length(zarray)
+            dzj  = zarray(j)-zarray(j-1);
+            [cs_j,phi_j,~] = mean_analytical(zarray(j),par);  % Calculate base state analytically 
             w_j = par.Q*phi_j^(par.n-1)*(1-phi_j)^2;            % steady-state melt velocity
-            tau_array(i) = tau_array(i) + 1./w_j*dzj;
+            MFields.tau_array(i) = MFields.tau_array(i) + 1./w_j*dzj;
         end
     end
     
@@ -255,16 +239,13 @@ for iQ = 1:nQs
         fprintf('.');
         FFields.Rmorh0= 0.0; FFields.Rcmorh0= 0.0;
         FFields.Rmorh = 0.0; FFields.Rcmorh = 0.0; 
-        for i=2:length(zf_array)
-            dz = zf_array(i)-zf_array(i-1); 
-            [cs_i,phi_i,~]    = mean_analytical(zf_array(i),par); % calculate steady state analytically 
-            [ch_i,phih_i]     = fluctuations(zf_array(i),par);
-            [~,qh_i,qch_i]    = get_other_ffields(phi_i,cs_i,phih_i,ch_i,par); 
-            tau = tau_array(i); 
+        for i=idx_zf+1:length(zarray)
+            dz  = zarray(i)-zarray(i-1);
+            qh_i = FFields.qh(i); qch_i = FFields.qch(i);
             FFields.Rmorh0  = FFields.Rmorh0  + 2.0*qh_i*dz/tan_alpha;
             FFields.Rcmorh0 = FFields.Rcmorh0 + 2.0*qch_i*dz/tan_alpha;
-            FFields.Rmorh   = FFields.Rmorh   + 2.0*exp(-1i*par.omega*tau)*qh_i*dz/tan_alpha;
-            FFields.Rcmorh  = FFields.Rcmorh  + 2.0*exp(-1i*par.omega*tau)*qch_i*dz/tan_alpha;
+            FFields.Rmorh   = FFields.Rmorh   + 2.0*exp(-1i*par.omega*MFields.tau_array(i))*qh_i*dz/tan_alpha;
+            FFields.Rcmorh  = FFields.Rcmorh  + 2.0*exp(-1i*par.omega*MFields.tau_array(i))*qch_i*dz/tan_alpha;
         end
         fprintf('.');
 

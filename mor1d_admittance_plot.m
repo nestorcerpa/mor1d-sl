@@ -33,8 +33,6 @@ close all; clear all;
 load('mor1d_admittance.mat');
 
 par_array  = data.par_array;
-MFieldsTop = data.MFieldsTop; 
-FFieldsTop = data.FFieldsTop; 
 BotSurfLag = data.lagBCtoSurf;
 tperiod    = data.tp_array;
 
@@ -56,8 +54,12 @@ legendsize= 16; % Legend fontsize
 fontsize = 16;  % Labels fontsize
 marksize = 20;
 
-col_FLUX = [0 0 1];
-col_ECO2 = [0.5 0 0.5];
+col_FLUX   = [0.0 0.0 1.0];
+col_ECO2   = [0.5 0.0 0.5];
+col_RMOR0  = [0.4 0.6 1.0];
+col_RMOR1  = [0.0 0.2 0.4];
+col_RCMOR0 = [1.0 0.6 1.0];
+col_RCMOR1 = [0.8 0.0 0.4];
 
 switch opt_admit
     case 1 
@@ -80,7 +82,7 @@ p = panel(nfig);
 % Create panel 2x3
 p.pack(1,2);
 
-p.margin=[22 20 5 8]; %% margin[left bottom right top]
+p.margin=[22 20 5 6]; %% margin[left bottom right top]
 p.de.margin = 18;
 
 
@@ -91,17 +93,36 @@ p(1,1).select(); SF=gca;
 
 for iQ=params_to_plot
     
-    fprintf('Plotting admittance for Q=%4.1e \n',par_array(iQ,1).Q);
+    fprintf('Plotting admittance for Q=%4.1e \n',data.par_array(iQ,1).Q);
     
-    RelAdm_FLUX = par_array(iQ,1).delta0*abs(FFieldsTop.qh(iQ,:))./MFieldsTop.q(iQ);  
-    RelAdm_ECO2 = par_array(iQ,1).delta0*abs(FFieldsTop.qch(iQ,:))./MFieldsTop.qc(iQ);
+    %%% Fluctuations to plot
+    RelAdm_FLUX      = data.par_array(iQ,1).delta0*abs(data.FFieldsTop.qh(iQ,:))./data.MFieldsTop.q(iQ);  
+    RelAdm_ECO2      = data.par_array(iQ,1).delta0*abs(data.FFieldsTop.qch(iQ,:))./data.MFieldsTop.qc(iQ);
+    RelAdm_RMOR0  = data.par_array(iQ,1).delta0*abs(data.FFieldsMOR.Rmorh0(iQ,:))./data.MFieldsMOR.Rmor(iQ);
+    RelAdm_RMOR1  = data.par_array(iQ,1).delta0*abs(data.FFieldsMOR.Rmorh(iQ,:))./data.MFieldsMOR.Rmor(iQ);  
+    RelAdm_RCMOR0 = data.par_array(iQ,1).delta0*abs(data.FFieldsMOR.Rcmorh0(iQ,:))./data.MFieldsMOR.Rcmor(iQ);
+    RelAdm_RCMOR1 = data.par_array(iQ,1).delta0*abs(data.FFieldsMOR.Rcmorh(iQ,:))./data.MFieldsMOR.Rcmor(iQ);     
     
     if (opt_admit ~= 3)  % If wet or dry models
-        plot(SF,tperiod,2*RelAdm_FLUX*100,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+        if (opt_admit == 1) 
+            plot(SF,tperiod,2*RelAdm_FLUX*100,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+        elseif (opt_admit == 2)
+            RelAdm_FLUX_BK15 = data.par_array_BK15(1,1).delta0*abs(data.FFieldsTop_BK15.qh(1,:))./data.MFieldsTop_BK15.q(1);
+            plot(SF,tperiod,2*RelAdm_RMOR0*100,'LineWidth',linew,'color',col_RMOR0,'LineStyle',lins{iQ}); hold on;
+            plot(SF,tperiod,2*RelAdm_RMOR1*100,'LineWidth',linew,'color',col_RMOR1,'LineStyle',lins{iQ}); hold on;
+            plot(SF,tperiod,2*RelAdm_FLUX*100,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+            plot(SF,tperiod,2*RelAdm_FLUX_BK15*100,'LineWidth',linew-2,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+        end
     end
     if  (opt_admit ~= 2) % If wet or basal-flux models
-        [~,idx_min]  = min(abs(tperiod(:)-5.0));
-        plot(SF,tperiod(idx_min:end),2*RelAdm_ECO2(idx_min:end)*100,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
+        tpmin=12.0; [~,idx_min]  = min(abs(tperiod(:)-tpmin));
+        if (opt_admit == 1) 
+            plot(SF,tperiod(idx_min:end),2*RelAdm_ECO2(idx_min:end)*100,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
+        elseif (opt_admit == 3) 
+            RelAdm_ECO2_BK15 = data.par_array_BK15(1,1).delta0*abs(data.FFieldsTop_BK15.qch(2,:))./data.MFieldsTop_BK15.qc(2);
+            plot(SF,tperiod(idx_min:end),2*RelAdm_ECO2(idx_min:end)*100,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;    
+            plot(SF,tperiod(idx_min:end),2*RelAdm_ECO2_BK15(idx_min:end)*100,'LineWidth',linew-2,'color',col_ECO2,'LineStyle',lins{iQ}); hold on; 
+        end
     end
     
     if (iQ==params_to_plot(1)) 
@@ -112,7 +133,7 @@ for iQ=params_to_plot
          if (opt_admit ~= 3)
             set(SF,'ylim',[0 20]);
         else
-            set(SF,'ylim',[0 100]);
+            set(SF,'ylim',[0 80]);
         end
         grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
     end
@@ -128,20 +149,31 @@ for iQ=params_to_plot
 
     fprintf('Plotting Lag for Q=%4.1e \n',par_array(iQ,1).Q);
 
-    lag_q  = (wrapTo2Pi(-angle(FFieldsTop.qh(iQ,:))) - pi/2).*tperiod/(2*pi);
-    lag_qc = (wrapTo2Pi(-angle(FFieldsTop.qch(iQ,:))) - pi/2).*tperiod/(2*pi);
-
+    lag_q     = (wrapTo2Pi(-angle(data.FFieldsTop.qh(iQ,:)))  - pi/2).*tperiod/(2*pi);
+    lag_qc    = (wrapTo2Pi(-angle(data.FFieldsTop.qch(iQ,:))) - pi/2).*tperiod/(2*pi);
+    lag_Rmor0 = (wrapTo2Pi(-angle(data.FFieldsMOR.Rmorh0(iQ,:))) - pi/2).*tperiod/(2*pi);
+    lag_Rmor1 = (wrapTo2Pi(-angle(data.FFieldsMOR.Rmorh(iQ,:)))  - pi/2).*tperiod/(2*pi);
     
     if (opt_admit ~= 3)  % If wet or dry models
-        plot(SF,tperiod(:),lag_q,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+        if (opt_admit == 1) 
+            plot(SF,tperiod(:),lag_q,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
+        elseif (opt_admit == 2)
+            lag_q_BK15   = (wrapTo2Pi(-angle(data.FFieldsTop_BK15.qh(1,:))) - pi/2).*tperiod/(2*pi);
+            plot(SF,tperiod,lag_Rmor0,'LineWidth',linew,'color',col_RMOR0,'LineStyle',lins{iQ}); hold on;    
+            plot(SF,tperiod,lag_Rmor1,'LineWidth',linew,'color',col_RMOR1,'LineStyle',lins{iQ}); hold on;   
+            plot(SF,tperiod,lag_q,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on; 
+            plot(SF,tperiod,lag_q_BK15,'LineWidth',linew-2,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;     
+        end
     end
     if  (opt_admit ~= 2) % If wet or basal-flux models
         if (opt_admit == 1) 
            plot(SF,tperiod,lag_qc,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
         elseif (opt_admit == 3) 
-           lag_qc = BotSurfLag.qc(iQ,:);
-           [~,idx_min]  = min(abs(tperiod(:)-5.0)); 
+           lag_qc      = data.lagBCtoSurf.qc(iQ,:);
+           lag_qc_BK15 = data.lagBCtoSurf_BK15.qc(2,:);
+           [~,idx_min]  = min(abs(tperiod(:)-tpmin)); 
            plot(SF,tperiod(idx_min:end),lag_qc(idx_min:end)+0.25*tperiod(idx_min:end),'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
+           plot(SF,tperiod(idx_min:end),lag_qc_BK15(idx_min:end)+0.25*tperiod(idx_min:end),'LineWidth',linew-2,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
         end
     end
 
@@ -154,7 +186,7 @@ for iQ=params_to_plot
             set(SF,'ylim',[-5 20]);
             ylabel(SF,{'Lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
         else
-            set(SF,'ylim',[0 80]);
+            set(SF,'ylim',[0 140]);
             ylabel(SF,{'Bottom-to-surface lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
         end
         grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
@@ -171,10 +203,14 @@ switch opt_admit
         [hh,icons,plots,txt] = legend(h,{'melt flux','carbon flux'},'Box','off','Fontsize',18,'Position',[0.28 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');  
     case 2
         h(1)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew); hold on;
-        [hh,icons,plots,txt] = legend(h,{'melt flux'},'Box','off','Fontsize',18,'Position',[0.28 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');          
+        h(2)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew-2); hold on;
+        h(3)=plot(NaN,NaN,'-','Color',col_RMOR0,'linewidth',linew); hold on;
+        h(4)=plot(NaN,NaN,'-','Color',col_RMOR1,'linewidth',linew); hold on;
+        [hh,icons,plots,txt] = legend(h,{'1-d model','1-d model ($\mathcal{Q}$,n of B\&K15)','pseudo-2-d model ($\tau=0)$','pseudo-2-d model ($\tau>0)$'},'Box','on','EdgeColor',[1 1 1],'Fontsize',16,'Position',[0.69 0.79 0.2 0.1],'Units','normalized','Orientation','vertical');          
     case 3
         h(1)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew); hold on;
-        [hh,icons,plots,txt] = legend(h,{'carbon flux'},'Box','off','Fontsize',18,'Position',[0.28 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');  
+        h(2)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew-2); hold on;
+        [hh,icons,plots,txt] = legend(h,{'with reference parameters','with parameters of B\&K15'},'Box','on','EdgeColor',[1 1 1],'Fontsize',16,'Position',[0.195 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');  
 end
 fprintf('... DONE \n\n');
 

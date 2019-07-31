@@ -48,5 +48,12 @@ function par=get_dimensionless_parameters(par)
        fprintf('\n\n #-----# \t\t\t    DERIVING DIMENSIONLESS MODEL PARAMETERS   \t\t\t   #-----#') 
        fprintf('\n #-----# Q = %4.2e ; Deff = %6.5e ; Gamma = %4.2f ; M = %4.2f ; omega = %4.2f; delta0 = %4.1e #-----# \n\n',par.Q,par.Deff,par.G,par.M,par.omega,par.delta0); 
     end
+   
+    %----------%%----------%%----------%%----------%
+    %----------% ## OTHER MODEL PARAMETERS ## %----------%
+    %----------%%----------%%----------%%----------%
+        
+    %----------% Spatial and time arrays %----------%
+    par.nz = ceil(par.H/par.dz + 1); % z-array discretisation points
     
 end

@@ -23,7 +23,7 @@
 % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 % SOFTWARE.
 
-close all; clear all;
+close all; clear all; tic; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %----------% Initialize parameters %----------%
@@ -33,15 +33,18 @@ par = input_parameters(); % Initializing model parameters
 
 par.Gammap = 'off';
 par.H = par.Hdry; 
+% par.n = 3; par.Q=6.8600e+07;
 
 %%% Burley and Katz 2015 parameters 
-% cmyr_to_ms = 0.316881e-9;
-% U0_BK15 = 3.0; k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01;
-% W0_BK15 = U0_BK15*2.0/pi; % in m/s
-% w0_BK15 = drho_BK15*10.0*k0_BK15/phi0_BK15/cmyr_to_ms;
-% Q_BK15 = (w0_BK15/W0_BK15)^n_BK15 * par.Fmax^(1-n_BK15);
-% par.Q = Q_BK15;
-% par.n = n_BK15;
+cmyr_to_ms = 0.316881e-9;
+W0_BK15 = 3.0*2/pi*cmyr_to_ms;   % in m/s
+k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01;
+k_BK15 = k0_BK15/(phi0_BK15^(n_BK15));
+Q_BK15 = drho_BK15*10.0*k_BK15/(W0_BK15);
+w0_on_W0_BK15 = par.Fmax^((n_BK15-1)/n_BK15) * Q_BK15^(1./n_BK15); w0_BK15=w0_on_W0_BK15*W0_BK15;
+par.W0 = W0_BK15/cmyr_to_ms;
+par.Q  = Q_BK15;
+par.n  = n_BK15;
 
 par   = get_dimensionless_parameters(par);  % Updating dimensionless parameters 
 
@@ -74,16 +77,8 @@ nperiods = 2; % number of fluctuating-periods to plot in z-t space
 %----------%  2-d Approximation for MOR focusing  %----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-drho = 500;           % solid-liquid density contrast 
-rhol = par.rhom-drho; % liquid density
-rhoc = 2900.;         % crust density
-
-par.alpha = 30.;      % angle of decompaction channel
-par.xf    = 33.2;     % focusing distance xf
-hf    = par.xf*tan(par.alpha*pi/180.); % depth decompating channel at x=xf
-
-nz = 30;
-zf_array  = linspace(par.H-hf,par.H,nz)/par.H;
+nz = 40;
+zf_array  = linspace(par.H-par.hf,par.H,nz)/par.H;
 tan_alpha = tan(par.alpha*pi/180.);
 
 %----------% Calculate steady state %----------%
@@ -94,7 +89,7 @@ for i=2:length(zf_array)
     [W_i,q_i,qc_i] = get_other_mfields(phi_i,cs_i,par); % Get other variables    
     MFields.Rmor  = MFields.Rmor  + 2*q_i*dz/tan_alpha; % Factor 2 is for taking into account both sides of ridge's axis
     MFields.Rcmor = MFields.Rcmor + 2*qc_i*dz/tan_alpha;
-    MFields.Hcru  = MFields.Hcru  + 2*q_i/(pi/2)*rhol/rhoc*dz/tan_alpha;
+    MFields.Hcru  = MFields.Hcru  + 2*q_i/(pi/2)*par.rhol/par.rhoc*dz/tan_alpha;
     tau_array(i)  = 0.0; % tranport-time for melt originated at z = zf_array(i)
     for j = i:length(zf_array)
         dzj  = zf_array(j)-zf_array(j-1);
@@ -115,7 +110,7 @@ FFields.Rmorh1 = 0.0; FFields.Rcmorh1 = 0.0;
 for i=2:length(zf_array)
     dz  = zf_array(i)-zf_array(i-1);
     [cs_i,phi_i,~] = mean_analytical(zf_array(i),par); % Calculate base state analytically 
-    [ch_i,phih_i] = fluctuations(zf_array(i),par);
+    [ch_i,phih_i]  = fluctuations(zf_array(i),par);
     [Wh_i,qh_i,qch_i] = get_other_ffields(phi_i,cs_i,phih_i,ch_i,par); 
     % Instantaneous focusing     
     FFields.Rmorh0  = FFields.Rmorh0  + 2.0*qh_i*dz/tan_alpha;
@@ -165,6 +160,7 @@ nfig=nfig+1; figure(nfig);
 plot_fluctuations_ztspace(nfig,MFields,FFields,par,linew,fonts,nperiods); 
 
 
+toc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%         LOCAL FUNCTIONS         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%

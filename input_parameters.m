@@ -47,7 +47,7 @@ function par=input_parameters(varargin);
     par.Gammap ='on';   % Option to run a basal-flux model like Burley and Katz (2015)
 
     %----------% Spatial and time parameters %----------%
-    par.tp   = 10.e3;  % Period of forging             [yr]
+    par.tp   = 100.e3;  % Period of forging             [yr]
     par.Hdry = 65.;     % Height of dry-melting column  [km]
     par.H    = 130.;    % Height of melting column      [km]
 
@@ -56,6 +56,17 @@ function par=input_parameters(varargin);
     par.rhom = 3300;    % Mantle density                    [kg/m3]
     par.S0 = 50;        % Amplitude of sea-level vairiation [m]
 
+    %----------% Parameters for pseudo-2-d models %----------%
+    par.alpha = 30.;                % angle of decompaction channel
+    par.xf    = 33.5;               % focusing distance xf
+    par.hf    = par.xf*tan(par.alpha*pi/180.); % depth decompating channel at x=xf
+    
+    %----------% Parameters for crust production %----------%
+    par.drho  = 500;                % solid-melt density contrast
+    par.rhol  = par.rhom-par.drho;  % melt density
+    par.rhoc  = 2900;               % oceanic crust density    
+    
+    
     %----------% Input dimensionless parameters %----------%
     par.Q       = 1e5;  % $\mathcal{Q}$
     
@@ -70,37 +81,30 @@ function par=input_parameters(varargin);
 
     %----------% Miscellaneous options %----------%
     par.verb='on';               % Verbosity
-         
-    %----------%%----------%%----------%%----------%%----------%
-    %----------%  ##  Modifying matlab options  ##  %----------%
-    %----------%%----------%%----------%%----------%%----------%    
-    
+   
+
+    %----------% Spatial and time arrays %----------%
+    par.dz = 0.25;    % cell size in km
+    par.ntime = 100; % number of time steps
+
+        
     %----------% Add paths to functions %----------%
     if (nargin==0 || varargin{1}~=false);
         fprintf('...restoring default matlab path...')
         restoredefaultpath; addpath(genpath([pwd,'/src/']),genpath([pwd,'/external-functions/'])); 
+         %----------% Derive dimensionless parameters %----------%
+        par=get_dimensionless_parameters(par);
     end;
-
-    %----------%%----------%%----------%%----------%
-    %----------% ## OTHER MODEL PARAMETERS ## %----------%
-    %----------%%----------%%----------%%----------%
     
-    %----------% Derive dimensionless parameters %----------%
-    par=get_dimensionless_parameters(par);
-    
-    %----------% Spatial and time arrays %----------%
-    par.nz = 400;
-    par.ntime = 100;
-    
-    
+    %----------%%----------%%----------%%----------%%----------%
+    %----------%  ##  Modifying matlab options  ##  %----------%
+    %----------%%----------%%----------%%----------%%----------%    
     
     %----------% Latex font %----------%
     if (strcmp(get(groot,'defaulttextinterpreter'),'latex')~=1); set(groot,'defaulttextinterpreter','latex'); end;
     if (strcmp(get(groot,'defaultAxesTickLabelInterpreter'),'latex')~=1); set(groot,'defaultAxesTickLabelInterpreter','latex'); end;
     if (strcmp(get(groot,'defaultLegendInterpreter'),'latex')~=1); set(groot,'defaultLegendInterpreter','latex'); end;
-    
-    
-    
+        
 end
 
 
