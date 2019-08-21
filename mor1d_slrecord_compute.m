@@ -134,7 +134,7 @@ for iw = 1:length(w0_array)
         DATA.model{iw}.Rmorh1(iperiod,1)   = Rmorh1;
         DATA.model{iw}.Rcmorh0(iperiod,1)  = Rcmorh0;
         DATA.model{iw}.Rcmorh1(iperiod,1)  = Rcmorh1;
-    endn
+    end
     DATA.model{iw}.par = par;  
 end
 DATA.SL      = SL;
@@ -152,8 +152,7 @@ save(datafile,'DATA','-v7.3');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-function [SL] = ReadSLrecord(filename,timew,tp_min);
+function SL = ReadSLrecord(filename,timew,tp_min);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % READSLRECORD Reads sea-level record from .txt file 
