@@ -169,16 +169,20 @@ par = input_parameters(0);
 
 %%% Burley and Katz 2015 parameters 
 cmyr_to_ms = 0.316881e-9;
-W0_BK15    = 3.0*2/pi*cmyr_to_ms;   % in [m/s] with U0= 3 cm/yr 
-k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01;
+U0_BK15 = 3.0;            % Half spreading rate [cm/yr]
+alpha_c = atan(35/60);    % approximate value
+W0_BK15 = U0_BK15*2*(1-(sin(alpha_c))^2)/(pi-2*alpha_c-sin(2*alpha_c))*cmyr_to_ms;   % [m/s]
+k0_BK15 = 1e-12; drho_BK15 = 500.; n_BK15=3; phi0_BK15 = 0.01; Hdry_BK15 = 60; Fmax_BK15 = 0.18;
 k_BK15 = k0_BK15/(phi0_BK15^(n_BK15));
 Q_BK15 = drho_BK15*10.0*k_BK15/(W0_BK15);
 w0_on_W0_BK15 = par.Fmax^((n_BK15-1)/n_BK15) * Q_BK15^(1./n_BK15); w0_BK15=w0_on_W0_BK15*W0_BK15;
 
-par.W0 = W0_BK15/cmyr_to_ms;
-par.n  = n_BK15; 
-par.Q  = Q_BK15;
-par.H  = par.Hdry;
+par.W0   = W0_BK15/cmyr_to_ms;
+par.n    = n_BK15; 
+par.Q    = Q_BK15;
+par.Fmax = Fmax_BK15;
+par.Hdry = Hdry_BK15;
+par.H    = par.Hdry;
 Gammap   = {'on' 'off'}; 
 nQs = length(Gammap);
 par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 

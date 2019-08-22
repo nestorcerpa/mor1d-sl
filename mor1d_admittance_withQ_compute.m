@@ -49,8 +49,7 @@ par.verb = "off";
 for iQ = 1:nQs
     
     fprintf('\n ### Calculating admittance for model series : %2d ... \n', iQ);
-    par.Q      = Q_array(iQ); 
-    par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+    par.Q = Q_array(iQ); 
 
     fprintf(' --->  Q = %6.1e \n',par.Q)
     
@@ -59,8 +58,9 @@ for iQ = 1:nQs
         fprintf('%3d/%3d  ',itp,ntps);
         
         %----------% Update forcing period %----------%
-        par.tp    = tp_array(itp)*1e3; % [yr]
-        par=get_dimensionless_parameters(par);  % Updating dimensionless parameters (for omega)
+        par.tp = tp_array(itp)*1e3; % [yr]
+        par    = get_dimensionless_parameters(par);  % Updating dimensionless parameters (for omega);
+        zarray = linspace(0,1,par.nz); 
          
         %----------%%----------%%----------%%----------%
         %----------% Calculating solution   %----------%

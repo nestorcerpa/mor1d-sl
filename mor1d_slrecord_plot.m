@@ -44,7 +44,7 @@ for iw=1:length(DATA.model)
     Q_values(iw) = DATA.model{iw}.par.Q;
     TMP{iw} = DATA.model{iw};
 end
-[~,idx_sort] = sort(Q_values); iw_w0ref = idx_sort(iw_w0ref);
+[~,idx_sort] = sort(Q_values); iw_w0ref = idx_sort(2);
 for iw=1:length(DATA.model)
    DATA.model{iw} = TMP{idx_sort(iw)};
 end;
@@ -287,7 +287,6 @@ plot(w0*1e-2,varR1,'-','color',col_RMOR1,'linewidth',linew);
 plot(w0ref*1e-2,varR0ref,'o','markersize',10,'MarkerEdgeColor',col_RMOR0,'MarkerFaceColor',col_RMOR0); 
 plot(w0ref*1e-2,varQref,'o','markersize',10,'MarkerEdgeColor','b','MarkerFaceColor','b');
 plot(w0ref*1e-2,varR1ref,'o','markersize',10,'MarkerEdgeColor',col_RMOR1,'MarkerFaceColor',col_RMOR1); 
-xlabel(fig,'Maximum melt velocity [m/yr]');
 ylabel(fig,'$A_Q$ [$\%$]');
 xlim(fig,[0 10]);
 ylim(fig,[0 40]);
@@ -325,7 +324,6 @@ plot(w0*1e-2,lag_Rmor1*dt,'-','Color',col_RMOR1,'linewidth',linew);
 plot(w0ref*1e-2,lag_Rmor0ref*dt,'o','markersize',10,'MarkerEdgeColor',col_RMOR0,'MarkerFaceColor',col_RMOR0); 
 plot(w0ref*1e-2,lag_qref*dt,'o','markersize',10,'MarkerEdgeColor','b','MarkerFaceColor','b'); 
 plot(w0ref*1e-2,lag_Rmor1ref*dt,'o','markersize',10,'MarkerEdgeColor',col_RMOR1,'MarkerFaceColor',col_RMOR1); 
-xlabel(fig,'Maximum melt velocity [m/yr]');
 ylabel(fig,'Lag [kyr]');
 xlim(fig,[0 10]);
 ylim(fig,[0 25]);

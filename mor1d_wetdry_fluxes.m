@@ -58,7 +58,8 @@ for iH = 1:length(Harray)
     par.H = Harray(iH);                     % H value
     par.Gammap = Gammap{iH};                % Turning on/off effects of sea-level induced pressure variations
     par=get_dimensionless_parameters(par);  % Updating dimensionless parameters 
-        
+    zarray = linspace(0,1,par.nz);
+    
     %----------% Calculate mean variables %----------%
     [MFields.cs,MFields.phi,~] = mean_analytical(zarray,par); %calculate base state analytically
     %----------% Get other mean variables %----------%

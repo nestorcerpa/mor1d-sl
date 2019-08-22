@@ -111,11 +111,10 @@ for iQ=params_to_plot
             plot(SF,tperiod,2*RelAdm_RMOR0*100,'LineWidth',linew,'color',col_RMOR0,'LineStyle',lins{iQ}); hold on;
             plot(SF,tperiod,2*RelAdm_RMOR1*100,'LineWidth',linew,'color',col_RMOR1,'LineStyle',lins{iQ}); hold on;
             plot(SF,tperiod,2*RelAdm_FLUX*100,'LineWidth',linew,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
-            plot(SF,tperiod,2*RelAdm_FLUX_BK15*100,'LineWidth',linew-2,'color',col_FLUX,'LineStyle',lins{iQ}); hold on;
         end
     end
     if  (opt_admit ~= 2) % If wet or basal-flux models
-        tpmin=12.0; [~,idx_min]  = min(abs(tperiod(:)-tpmin));
+        tpmin=8.0; [~,idx_min]  = min(abs(tperiod(:)-tpmin));
         if (opt_admit == 1) 
             plot(SF,tperiod(idx_min:end),2*RelAdm_ECO2(idx_min:end)*100,'LineWidth',linew,'color',col_ECO2,'LineStyle',lins{iQ}); hold on;
         elseif (opt_admit == 3) 
@@ -186,7 +185,7 @@ for iQ=params_to_plot
             set(SF,'ylim',[-5 20]);
             ylabel(SF,{'Lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
         else
-            set(SF,'ylim',[0 140]);
+            set(SF,'ylim',[0 100]);
             ylabel(SF,{'Bottom-to-surface lag [kyr]'},'Fontsize',fontsize,'interpreter','latex');
         end
         grid(SF,'on'); SF.XMinorGrid='on'; SF.YMinorGrid='on';
@@ -197,17 +196,16 @@ end
 
 %----------%%----------% Legend %----------%%----------%
 switch opt_admit
-    case 1
+    case 1 % wet
         h(1)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew); hold on;
         h(2)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew); hold on;
         [hh,icons,plots,txt] = legend(h,{'melt flux','carbon flux'},'Box','off','Fontsize',18,'Position',[0.28 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');  
-    case 2
+    case 2 % dry
         h(1)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew); hold on;
-        h(2)=plot(NaN,NaN,'-','Color',col_FLUX,'linewidth',linew-2); hold on;
-        h(3)=plot(NaN,NaN,'-','Color',col_RMOR0,'linewidth',linew); hold on;
-        h(4)=plot(NaN,NaN,'-','Color',col_RMOR1,'linewidth',linew); hold on;
-        [hh,icons,plots,txt] = legend(h,{'1-d model','1-d model ($\mathcal{Q}$,n of B\&K15)','pseudo-2-d model ($\tau=0)$','pseudo-2-d model ($\tau>0)$'},'Box','on','EdgeColor',[1 1 1],'Fontsize',16,'Position',[0.69 0.79 0.2 0.1],'Units','normalized','Orientation','vertical');          
-    case 3
+        h(2)=plot(NaN,NaN,'-','Color',col_RMOR0,'linewidth',linew); hold on;
+        h(3)=plot(NaN,NaN,'-','Color',col_RMOR1,'linewidth',linew); hold on;
+        [hh,icons,plots,txt] = legend(h,{'1-d model','pseudo-2-d model ($\tau=0)$','pseudo-2-d model ($\tau>0)$'},'Box','on','EdgeColor',[1 1 1],'Fontsize',16,'Position',[0.69 0.79 0.2 0.1],'Units','normalized','Orientation','vertical');          
+    case 3 % dry basal 
         h(1)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew); hold on;
         h(2)=plot(NaN,NaN,'-','Color',col_ECO2,'linewidth',linew-2); hold on;
         [hh,icons,plots,txt] = legend(h,{'with reference parameters','with parameters of B\&K15'},'Box','on','EdgeColor',[1 1 1],'Fontsize',16,'Position',[0.195 0.82 0.2 0.1],'Units','normalized','Orientation','vertical');  
