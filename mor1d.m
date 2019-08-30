@@ -31,7 +31,7 @@ close all; clear all; tic;
 
 par = input_parameters(); % Initializing model parameters
 
-%----------% To model with Burley and Katz 2015 parameters  %----------%
+% %----------% To model with Burley and Katz 2015 parameters  %----------%
 % cmyr_to_ms = 0.316881e-9;   
 % U0_BK15 = 3.0;              % [cm/yr]
 % alpha_c = atan(35/60);      % approximate value for decompating channel angle
@@ -46,9 +46,7 @@ par = input_parameters(); % Initializing model parameters
 % par.Hdry = H_BK15;
 % par.H    = par.Hdry; 
 % par.Gammap = 'off'; % To run basal-flux model
-
-
-par   = get_dimensionless_parameters(par);  % Updating dimensionless parameters 
+% par   = get_dimensionless_parameters(par);  % Updating dimensionless parameters
 
 
 %----------% Spatial and time arrays %----------%

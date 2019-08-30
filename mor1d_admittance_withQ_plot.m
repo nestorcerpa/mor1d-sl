@@ -65,10 +65,10 @@ for iQ = 1:nQs
     phimax   = (par_array(iQ).Fmax/par_array(iQ).Q)^(1./n);
     w0       = par_array(iQ).W0*par_array(iQ).Fmax/phimax; % [cm/yr]
     DeltaS   = 0.1;
-    Aqth(iQ)   = n*DeltaS/par_array(iQ).Hdry*par_array(iQ).rhow/par_array(iQ).rhom*w0/par_array(iQ).W0;         % Eq. (C.6)
-    Aqcth(iQ)  = (n-1)*DeltaS/par_array(iQ).Hdry*par_array(iQ).rhow/par_array(iQ).rhom*w0/par_array(iQ).W0;     % Eq. (C.8)
-    tpqth(iQ)  = 1./(n-1)*par_array(iQ).Hdry/(w0*1e-5)*1e-3;                                                    % Eq. (C.10a)
-    tpqcth(iQ) = (n-1)/(n^2 - 2*n + 1/n)*par_array(iQ).Hdry/(w0*1e-5)*1e-3;                                     % Eq. (C.10b)
+    Aqth(iQ)   = n*DeltaS/par_array(iQ).Hdry*par_array(iQ).rhow/par_array(iQ).rhom*w0/par_array(iQ).W0;         % Eq. (30b)
+    Aqcth(iQ)  = (n-1)*DeltaS/par_array(iQ).Hdry*par_array(iQ).rhow/par_array(iQ).rhom*w0/par_array(iQ).W0;     % Eq. (30c)
+    tpqth(iQ)  = n*par_array(iQ).Hdry/(w0*1e-5)*1e-3;                                                           % Eq. (23)
+    tpqcth(iQ) = n*par_array(iQ).Hdry/(w0*1e-5)*1e-3;                                                           % Eq. (23)
         
 end
 
