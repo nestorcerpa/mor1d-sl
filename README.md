@@ -44,9 +44,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## REFERENCE: 
-Cerpa, N. G., Rees Jones, D. W., and Katz, R. F.:
-Consequences of glacial cycles for magmatism and carbon transport at mid-ocean ridges 
-(Please cite final revised manuscript when available)
+Cerpa, N. G., Rees Jones, D. W., and Katz, R. F.,
+Consequences of glacial cycles for magmatism and carbon transport at mid-ocean ridges,
+Earth and Planetary Sci. Lett., (2019), https://doi.org/10.1016/j.epsl.2019.115845
 
 ## CODE SUMMARY: 
 * All functions needed to compute the 1-d melting column models are provided in src/
