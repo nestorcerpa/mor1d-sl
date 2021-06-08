@@ -29,6 +29,9 @@ close all; clear all;
 %----------%%----------% Reading data from  file %----------%%----------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+par = input_parameters(); % Initializing model parameters
+
+
 %----------% Loading files %----------%
 load('mor1d_admittance_withQ.mat');
 
